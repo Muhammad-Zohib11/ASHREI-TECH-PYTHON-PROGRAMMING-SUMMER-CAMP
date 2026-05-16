@@ -1,0 +1,1482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ASHRI Tech — Python Game Dev Bootcamp</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --orange: #FF6B00;
+  --orange-dim: rgba(255,107,0,0.15);
+  --orange-glow: rgba(255,107,0,0.08);
+  --teal: #00D68F;
+  --teal-dim: rgba(0,214,143,0.12);
+  --bg: #080C18;
+  --card: #0F1528;
+  --card2: #141D35;
+  --border: rgba(255,107,0,0.18);
+  --border-teal: rgba(0,214,143,0.18);
+  --text: #E8EAF0;
+  --muted: #7880A0;
+  --white: #FFFFFF;
+}
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+html { scroll-behavior:smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+/* STARS BACKGROUND */
+body::before {
+  content:'';
+  position:fixed; top:0;left:0;right:0;bottom:0;
+  background-image:
+    radial-gradient(1px 1px at 10% 15%, rgba(255,255,255,0.6) 0%, transparent 100%),
+    radial-gradient(1px 1px at 30% 40%, rgba(255,255,255,0.4) 0%, transparent 100%),
+    radial-gradient(1px 1px at 55% 20%, rgba(255,255,255,0.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 70% 60%, rgba(255,255,255,0.3) 0%, transparent 100%),
+    radial-gradient(1px 1px at 85% 10%, rgba(255,255,255,0.6) 0%, transparent 100%),
+    radial-gradient(1px 1px at 20% 70%, rgba(255,255,255,0.4) 0%, transparent 100%),
+    radial-gradient(1px 1px at 45% 85%, rgba(255,255,255,0.3) 0%, transparent 100%),
+    radial-gradient(1px 1px at 90% 45%, rgba(255,255,255,0.5) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 5% 55%, rgba(255,255,255,0.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 65% 75%, rgba(255,255,255,0.35) 0%, transparent 100%),
+    radial-gradient(1px 1px at 38% 5%, rgba(255,255,255,0.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 78% 88%, rgba(255,255,255,0.4) 0%, transparent 100%),
+    radial-gradient(1px 1px at 15% 92%, rgba(255,255,255,0.3) 0%, transparent 100%),
+    radial-gradient(1px 1px at 52% 52%, rgba(255,255,255,0.35) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 93% 78%, rgba(255,255,255,0.6) 0%, transparent 100%);
+  pointer-events:none;
+  z-index:0;
+}
+
+/* UTILITY */
+.container { max-width:1100px; margin:0 auto; padding:0 24px; position:relative; z-index:1; }
+.tag { display:inline-block; font-size:11px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; padding:4px 10px; border-radius:4px; }
+.tag-orange { background:var(--orange-dim); color:var(--orange); border:1px solid rgba(255,107,0,0.3); }
+.tag-teal { background:var(--teal-dim); color:var(--teal); border:1px solid rgba(0,214,143,0.3); }
+.tag-purple { background:rgba(139,92,246,0.12); color:#A78BFA; border:1px solid rgba(139,92,246,0.25); }
+
+/* HERO */
+.hero {
+  padding: 60px 0 40px;
+  text-align:center;
+  position:relative;
+}
+.hero-brand {
+  display:flex; align-items:center; justify-content:center; gap:12px;
+  margin-bottom:32px;
+}
+.brand-text { font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:0.15em; color:var(--muted); }
+.brand-sep { width:1px; height:24px; background:var(--border); }
+.brand-nastp { font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:0.15em; color:var(--orange); }
+.hero h1 {
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(52px, 8vw, 96px);
+  letter-spacing:0.05em;
+  line-height:0.9;
+  color:var(--white);
+  margin-bottom:8px;
+}
+.hero h1 span { color:var(--orange); }
+.hero-sub {
+  font-size:18px; color:var(--muted); margin-bottom:32px;
+  font-weight:300; letter-spacing:0.02em;
+}
+.hero-pills { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-bottom:48px; }
+.pill {
+  background:var(--card); border:1px solid var(--border);
+  border-radius:100px; padding:8px 20px;
+  font-size:13px; font-weight:500; color:var(--text);
+  display:flex; align-items:center; gap:8px;
+}
+.pill-dot { width:7px;height:7px;border-radius:50%; }
+.pill-dot.orange { background:var(--orange); }
+.pill-dot.teal { background:var(--teal); }
+.pill-dot.purple { background:#A78BFA; }
+
+/* GAME INTRO BANNER */
+.game-banner {
+  background: linear-gradient(135deg, var(--card) 0%, var(--card2) 100%);
+  border: 1px solid var(--border);
+  border-radius:16px;
+  padding:40px;
+  margin-bottom:64px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:40px;
+  align-items:center;
+  position:relative;
+  overflow:hidden;
+}
+.game-banner::before {
+  content:'';
+  position:absolute; top:0;right:0;
+  width:300px;height:300px;
+  background:radial-gradient(circle, rgba(255,107,0,0.06) 0%, transparent 70%);
+  pointer-events:none;
+}
+.game-banner-title {
+  font-family:'Bebas Neue',sans-serif;
+  font-size:14px; letter-spacing:0.2em;
+  color:var(--orange); margin-bottom:8px;
+  text-transform:uppercase;
+}
+.game-banner h2 {
+  font-family:'Bebas Neue',sans-serif;
+  font-size:48px; letter-spacing:0.04em;
+  color:var(--white); line-height:1;
+  margin-bottom:16px;
+}
+.game-banner p { color:var(--muted); font-size:14px; line-height:1.8; }
+.feature-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:20px; }
+.feature-chip {
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:8px; padding:8px 12px;
+  font-size:12px; font-weight:500; color:var(--muted);
+  display:flex; align-items:center; gap:6px;
+}
+.feature-chip .dot { width:6px;height:6px;border-radius:50%;background:var(--teal);flex-shrink:0; }
+
+/* MINI GAME CANVAS */
+.game-canvas-wrap {
+  background:#040810;
+  border:1px solid var(--border-teal);
+  border-radius:12px;
+  padding:4px;
+  aspect-ratio:4/3;
+  position:relative;
+  overflow:hidden;
+}
+.game-canvas-inner {
+  width:100%;height:100%;
+  border-radius:9px;
+  position:relative;
+  overflow:hidden;
+  background:#040810;
+}
+/* Stars in canvas */
+.star-layer {
+  position:absolute; top:0;left:0;right:0;bottom:0;
+  background-image:
+    radial-gradient(1px 1px at 8% 12%, rgba(255,255,255,0.7) 0%, transparent 100%),
+    radial-gradient(1px 1px at 25% 35%, rgba(255,255,255,0.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 65% 18%, rgba(255,255,255,0.6) 0%, transparent 100%),
+    radial-gradient(1px 1px at 80% 55%, rgba(255,255,255,0.4) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 40% 70%, rgba(255,255,255,0.7) 0%, transparent 100%),
+    radial-gradient(1px 1px at 90% 30%, rgba(255,255,255,0.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 15% 80%, rgba(255,255,255,0.4) 0%, transparent 100%),
+    radial-gradient(1px 1px at 55% 45%, rgba(255,255,255,0.3) 0%, transparent 100%),
+    radial-gradient(1px 1px at 72% 85%, rgba(255,255,255,0.5) 0%, transparent 100%);
+}
+/* Player ship */
+.player-ship {
+  position:absolute; bottom:18%; left:50%;
+  transform:translateX(-50%);
+  width:28px; height:36px;
+}
+.player-ship svg { width:100%;height:100%; }
+/* Enemy ships */
+.enemy-row { position:absolute; top:12%; left:0; right:0; display:flex; justify-content:space-around; padding:0 8%; }
+.enemy { width:20px;height:20px; }
+.enemy svg { width:100%;height:100%; }
+/* Bullet */
+@keyframes bulletUp { from{bottom:28%} to{bottom:100%} }
+@keyframes bulletUp2 { from{bottom:28%} to{bottom:100%} }
+.bullet {
+  position:absolute; left:calc(50% - 1.5px); bottom:28%;
+  width:3px; height:12px; background:var(--teal);
+  border-radius:2px; box-shadow:0 0 6px var(--teal);
+  animation:bulletUp 1.2s linear infinite;
+}
+.bullet2 {
+  position:absolute; left:calc(50% + 12px); bottom:28%;
+  width:3px; height:10px; background:#FF6B00;
+  border-radius:2px; box-shadow:0 0 6px #FF6B00;
+  animation:bulletUp2 1.6s linear infinite 0.4s;
+}
+/* HUD bar */
+.hud-bar {
+  position:absolute; top:0;left:0;right:0;
+  background:rgba(0,0,0,0.6);
+  backdrop-filter:blur(4px);
+  padding:6px 12px;
+  display:flex; justify-content:space-between; align-items:center;
+  font-family:'JetBrains Mono',monospace;
+  font-size:9px; color:var(--teal);
+  border-bottom:1px solid rgba(0,214,143,0.15);
+}
+.health-bar { display:flex;align-items:center;gap:4px; }
+.health-fill { height:5px;width:50px;background:rgba(255,255,255,0.1);border-radius:3px;overflow:hidden; }
+.health-fill-inner { height:100%;width:70%;background:var(--teal);border-radius:3px; }
+/* Explosion */
+@keyframes boom { 0%{transform:scale(0);opacity:1} 100%{transform:scale(2);opacity:0} }
+.explosion {
+  position:absolute; width:16px;height:16px;
+  border-radius:50%;
+  border:2px solid var(--orange);
+  box-shadow:0 0 10px var(--orange);
+  animation:boom 0.8s ease-out infinite;
+}
+/* Canvas label */
+.canvas-label {
+  position:absolute; bottom:8px;left:0;right:0;
+  text-align:center;
+  font-family:'JetBrains Mono',monospace;
+  font-size:8px;
+  color:rgba(0,214,143,0.5);
+  letter-spacing:0.1em;
+  pointer-events:none;
+}
+
+/* SECTION TITLE */
+.section-head { text-align:center; margin-bottom:48px; }
+.section-head .label {
+  font-size:12px; letter-spacing:0.2em; text-transform:uppercase;
+  color:var(--orange); font-weight:600; margin-bottom:12px;
+}
+.section-head h2 {
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(36px,5vw,56px);
+  letter-spacing:0.04em; color:var(--white);
+  line-height:1;
+}
+.section-head p { color:var(--muted); font-size:15px; margin-top:12px; }
+
+/* PHILOSOPHY STRIP */
+.philosophy-strip {
+  display:grid; grid-template-columns:1fr 1fr;
+  gap:2px; margin-bottom:64px;
+  border-radius:12px; overflow:hidden;
+  border:1px solid var(--border);
+}
+.phil-card {
+  background:var(--card);
+  padding:28px 32px;
+}
+.phil-card.contrast { background:var(--card2); }
+.phil-label { font-size:11px; letter-spacing:0.15em; text-transform:uppercase; color:var(--muted); margin-bottom:12px; font-weight:600; }
+.phil-old { color:#666; font-size:14px; font-style:italic; text-decoration:line-through; margin-bottom:8px; }
+.phil-new { color:var(--white); font-size:18px; font-weight:600; }
+.phil-new span { color:var(--orange); }
+
+/* DAY TIMELINE */
+.timeline { position:relative; }
+.timeline-track {
+  position:absolute; left:50%; top:0;bottom:0;
+  width:1px; background:linear-gradient(to bottom, transparent, var(--border) 5%, var(--border) 95%, transparent);
+  transform:translateX(-50%);
+}
+
+/* DAY CARD */
+.day-card {
+  display:grid;
+  grid-template-columns:1fr 48px 1fr;
+  gap:0; margin-bottom:32px;
+  align-items:start;
+}
+.day-card:nth-child(even) .day-left { order:3; }
+.day-card:nth-child(even) .day-center { order:2; }
+.day-card:nth-child(even) .day-right { order:1; }
+
+.day-left, .day-right {
+  padding: 0 32px;
+}
+.day-card:nth-child(even) .day-left { text-align:right; }
+.day-card:nth-child(even) .day-right { text-align:left; }
+
+.day-center {
+  display:flex; flex-direction:column; align-items:center;
+  padding-top:24px;
+}
+.day-node {
+  width:48px;height:48px;
+  border-radius:50%;
+  background:var(--card2);
+  border:2px solid var(--orange);
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Bebas Neue',sans-serif;
+  font-size:18px; color:var(--orange);
+  letter-spacing:0.05em;
+  flex-shrink:0;
+  position:relative;
+  z-index:2;
+  box-shadow:0 0 20px rgba(255,107,0,0.2);
+  cursor:pointer;
+  transition:all 0.2s ease;
+}
+.day-node:hover {
+  transform:scale(1.1);
+  box-shadow:0 0 32px rgba(255,107,0,0.4);
+}
+.day-node.teal-node { border-color:var(--teal); color:var(--teal); box-shadow:0 0 20px rgba(0,214,143,0.2); }
+.day-node.teal-node:hover { box-shadow:0 0 32px rgba(0,214,143,0.4); }
+.day-node.purple-node { border-color:#A78BFA; color:#A78BFA; box-shadow:0 0 20px rgba(167,139,250,0.2); }
+.day-node.purple-node:hover { box-shadow:0 0 32px rgba(167,139,250,0.4); }
+
+.day-inner {
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:24px;
+  transition:border-color 0.2s, box-shadow 0.2s;
+  cursor:pointer;
+}
+.day-inner:hover {
+  border-color:rgba(255,107,0,0.4);
+  box-shadow:0 4px 32px rgba(255,107,0,0.08);
+}
+.day-inner.teal-card { border-color:var(--border-teal); }
+.day-inner.teal-card:hover { border-color:rgba(0,214,143,0.4); box-shadow:0 4px 32px rgba(0,214,143,0.08); }
+.day-inner.purple-card { border-color:rgba(167,139,250,0.18); }
+.day-inner.purple-card:hover { border-color:rgba(167,139,250,0.4); box-shadow:0 4px 32px rgba(167,139,250,0.08); }
+
+.day-theme {
+  font-size:10px; letter-spacing:0.15em; text-transform:uppercase;
+  font-weight:600; margin-bottom:8px;
+}
+.day-title {
+  font-family:'Bebas Neue',sans-serif;
+  font-size:24px; letter-spacing:0.04em;
+  color:var(--white); line-height:1.1;
+  margin-bottom:12px;
+}
+.day-subtitle { font-size:13px; color:var(--muted); margin-bottom:16px; line-height:1.7; }
+.day-concept {
+  display:flex;align-items:flex-start;gap:8px;
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.06);
+  border-radius:8px; padding:10px 12px;
+  margin-bottom:12px;
+}
+.concept-icon { font-size:16px; flex-shrink:0; }
+.concept-text { font-size:12px; color:var(--muted); line-height:1.6; }
+.concept-text strong { color:var(--text); font-weight:600; }
+
+/* CODE SNIPPET */
+.code-block {
+  background:#040810;
+  border:1px solid rgba(255,255,255,0.07);
+  border-radius:8px;
+  padding:12px 14px;
+  margin-top:12px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;
+  line-height:1.8;
+  overflow:hidden;
+}
+.code-comment { color:#4A5568; }
+.code-keyword { color:#A78BFA; }
+.code-string { color:#68D391; }
+.code-func { color:#63B3ED; }
+.code-var { color:#F6AD55; }
+.code-num { color:#FC8181; }
+.code-op { color:#E2E8F0; }
+
+/* MINI GAME PREVIEW (small) */
+.mini-preview {
+  background:#040810;
+  border:1px solid var(--border-teal);
+  border-radius:8px;
+  aspect-ratio:16/9;
+  position:relative;
+  overflow:hidden;
+  margin-top:12px;
+  font-size:10px;
+}
+.preview-label {
+  position:absolute;bottom:6px;right:8px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:8px; color:rgba(0,214,143,0.4);
+  letter-spacing:0.1em;
+}
+
+/* GAME BUILD PROGRESS */
+.progress-section { margin-bottom:64px; }
+.progress-header { display:flex;justify-content:space-between;align-items:center;margin-bottom:20px; }
+.progress-days { display:grid;grid-template-columns:repeat(10,1fr);gap:4px; }
+.prog-day {
+  height:6px; border-radius:3px;
+  background:rgba(255,255,255,0.06);
+  transition:background 0.3s ease;
+  cursor:pointer;
+  position:relative;
+}
+.prog-day.filled { background:var(--orange); }
+.prog-day.teal-fill { background:var(--teal); }
+.prog-day.purple-fill { background:#A78BFA; }
+.prog-day:hover::after {
+  content:attr(data-label);
+  position:absolute;bottom:10px;left:50%;transform:translateX(-50%);
+  background:var(--card2);border:1px solid var(--border);
+  color:var(--text);font-size:10px;padding:3px 7px;border-radius:4px;
+  white-space:nowrap;pointer-events:none;font-family:'JetBrains Mono',monospace;
+}
+
+/* WHAT'S ADDED EACH DAY - visual */
+.build-stages { display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:64px; }
+.stage-card {
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:16px;
+  position:relative;
+  overflow:hidden;
+}
+.stage-card::before {
+  content:'';
+  position:absolute;bottom:0;left:0;right:0;
+  height:2px;
+  background:var(--orange);
+}
+.stage-num {
+  font-family:'Bebas Neue',sans-serif;
+  font-size:11px;letter-spacing:0.15em;
+  color:var(--orange);margin-bottom:8px;
+}
+.stage-title { font-size:13px;font-weight:600;color:var(--white);margin-bottom:6px; }
+.stage-adds { font-size:11px;color:var(--muted);line-height:1.6; }
+.stage-chip { display:inline-flex;align-items:center;gap:4px;background:var(--orange-dim);color:var(--orange);padding:2px 7px;border-radius:4px;font-size:9px;font-weight:600;letter-spacing:0.06em;margin-top:8px; }
+.stage-chip.teal { background:var(--teal-dim);color:var(--teal); }
+
+/* DAILY STRUCTURE */
+.structure-section { margin-bottom:64px; }
+.structure-title { font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:0.15em;color:var(--orange);text-transform:uppercase;margin-bottom:20px; }
+.struct-flow { display:flex;gap:0; }
+.struct-step {
+  flex:1;
+  background:var(--card);
+  border:1px solid var(--border);
+  padding:20px 16px;
+  position:relative;
+  text-align:center;
+}
+.struct-step:not(:last-child)::after {
+  content:'▶';
+  position:absolute;right:-10px;top:50%;transform:translateY(-50%);
+  font-size:10px;color:var(--orange);z-index:1;
+}
+.struct-step:first-child { border-radius:10px 0 0 10px; }
+.struct-step:last-child { border-radius:0 10px 10px 0; }
+.struct-time { font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:600;color:var(--orange);margin-bottom:4px; }
+.struct-name { font-size:12px;font-weight:600;color:var(--white);margin-bottom:4px; }
+.struct-desc { font-size:10px;color:var(--muted);line-height:1.5; }
+
+/* XP BADGES */
+.badges-grid { display:flex;flex-wrap:wrap;gap:10px;margin-bottom:64px; }
+.badge {
+  background:var(--card2);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:12px 18px;
+  display:flex;align-items:center;gap:10px;
+  font-size:12px;font-weight:600;color:var(--text);
+}
+.badge-icon { font-size:22px; }
+.badge-xp { font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:0.05em;color:var(--orange); }
+
+/* FOOTER */
+.footer {
+  border-top:1px solid var(--border);
+  padding:32px 0;
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:12px;color:var(--muted);
+}
+.footer-brand { font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:0.15em;color:var(--orange); }
+
+/* SEPARATOR */
+.sep { border:none;height:1px;background:linear-gradient(to right,transparent,var(--border),transparent);margin:48px 0; }
+
+/* DETAIL EXPAND */
+.expand-content { display:none; }
+.expand-content.open { display:block; }
+
+/* SCROLL REVEAL (simple) */
+.reveal { opacity:0;transform:translateY(24px);transition:opacity 0.6s ease,transform 0.6s ease; }
+.reveal.visible { opacity:1;transform:translateY(0); }
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .game-banner{grid-template-columns:1fr;}
+  .game-canvas-wrap{display:none;}
+  .timeline-track{display:none;}
+  .day-card{grid-template-columns:1fr;grid-template-rows:auto;}
+  .day-card .day-left,.day-card .day-right{padding:0;order:unset!important;}
+  .day-center{order:0!important;flex-direction:row;margin-bottom:8px;}
+  .day-node{width:36px;height:36px;font-size:14px;}
+  .build-stages{grid-template-columns:repeat(2,1fr);}
+  .struct-flow{flex-direction:column;}
+  .struct-step::after{display:none;}
+  .struct-step:first-child{border-radius:10px 10px 0 0;}
+  .struct-step:last-child{border-radius:0 0 10px 10px;}
+  .philosophy-strip{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ HERO ═══════════════ -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-brand">
+      <span class="brand-text">ASHREI TECH</span>
+      <div class="brand-sep"></div>
+      <span class="brand-nastp">NASTP</span>
+    </div>
+    <h1>PYTHON <span>GAME</span><br>DEV CAMP</h1>
+    <p class="hero-sub">10 Days · One Game · Every Concept Unlocked</p>
+    <div class="hero-pills">
+      <div class="pill"><div class="pill-dot orange"></div>10 Day Program</div>
+      <div class="pill"><div class="pill-dot teal"></div>Pygame Framework</div>
+      <div class="pill"><div class="pill-dot purple"></div>One Progressive Game</div>
+      <div class="pill"><div class="pill-dot orange"></div>Build-First Approach</div>
+      <div class="pill"><div class="pill-dot teal"></div>Ages 12–18</div>
+    </div>
+
+    <!-- Mini animated game preview -->
+    <div style="max-width:340px;margin:0 auto;">
+      <div class="game-canvas-wrap">
+        <div class="game-canvas-inner">
+          <div class="star-layer"></div>
+          <div class="hud-bar">
+            <div class="health-bar">
+              <span>HP</span>
+              <div class="health-fill"><div class="health-fill-inner"></div></div>
+            </div>
+            <span>SCORE: 2480</span>
+            <span>WAVE: 3</span>
+          </div>
+          <!-- Enemies -->
+          <div class="enemy-row" style="top:14%;">
+            <div class="enemy"><svg viewBox="0 0 20 20"><polygon points="10,2 18,16 2,16" fill="#FF6B00" opacity="0.9"/><rect x="7" y="12" width="2" height="4" fill="#FF9500"/><rect x="11" y="12" width="2" height="4" fill="#FF9500"/></svg></div>
+            <div class="enemy"><svg viewBox="0 0 20 20"><polygon points="10,2 18,16 2,16" fill="#FF6B00" opacity="0.9"/><rect x="7" y="12" width="2" height="4" fill="#FF9500"/><rect x="11" y="12" width="2" height="4" fill="#FF9500"/></svg></div>
+            <div class="enemy"><svg viewBox="0 0 20 20"><polygon points="10,2 18,16 2,16" fill="#FF6B00" opacity="0.9"/><rect x="7" y="12" width="2" height="4" fill="#FF9500"/><rect x="11" y="12" width="2" height="4" fill="#FF9500"/></svg></div>
+            <div class="enemy"><svg viewBox="0 0 20 20"><polygon points="10,2 18,16 2,16" fill="#FF6B00" opacity="0.9"/><rect x="7" y="12" width="2" height="4" fill="#FF9500"/><rect x="11" y="12" width="2" height="4" fill="#FF9500"/></svg></div>
+          </div>
+          <div class="enemy-row" style="top:28%;">
+            <div class="enemy"><svg viewBox="0 0 20 20"><polygon points="10,2 18,16 2,16" fill="#FF4500" opacity="0.7"/></svg></div>
+            <div class="enemy"><svg viewBox="0 0 20 20"><polygon points="10,2 18,16 2,16" fill="#FF4500" opacity="0.7"/></svg></div>
+            <div class="enemy"><svg viewBox="0 0 20 20"><polygon points="10,2 18,16 2,16" fill="#FF4500" opacity="0.7"/></svg></div>
+          </div>
+          <!-- Explosion -->
+          <div class="explosion" style="top:32%;left:35%;"></div>
+          <!-- Bullets -->
+          <div class="bullet"></div>
+          <div class="bullet2"></div>
+          <!-- Player ship -->
+          <div class="player-ship">
+            <svg viewBox="0 0 28 36"><polygon points="14,2 26,30 14,24 2,30" fill="#00D68F"/><polygon points="14,2 20,22 14,18 8,22" fill="#00F5A0" opacity="0.8"/><rect x="11" y="24" width="6" height="8" fill="#00A870"/></svg>
+          </div>
+          <div class="canvas-label">GALAXY DEFENDER · PYGAME · PYTHON</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ THE GAME BANNER ═══════════════ -->
+<section style="padding-bottom:64px;">
+  <div class="container">
+    <div class="game-banner reveal">
+      <div>
+        <div class="game-banner-title">The Single Game You Build Over 10 Days</div>
+        <h2>GALAXY<br>DEFENDER</h2>
+        <p>Students don't learn Python then apply it to games. They <strong style="color:var(--white)">build a real game from Day 2</strong> — and each new concept is the next feature they've been waiting for.</p>
+        <p style="margin-top:12px;">Every day, the game grows. By Day 10, they have a fully playable, shareable, original space shooter they built line by line.</p>
+        <div class="feature-grid">
+          <div class="feature-chip"><div class="dot"></div>Player ship + movement</div>
+          <div class="feature-chip"><div class="dot"></div>Health + score system</div>
+          <div class="feature-chip"><div class="dot"></div>Enemy waves + AI</div>
+          <div class="feature-chip"><div class="dot"></div>Bullet system</div>
+          <div class="feature-chip"><div class="dot"></div>Random loot drops</div>
+          <div class="feature-chip"><div class="dot"></div>Final playable game</div>
+        </div>
+      </div>
+      <div class="game-canvas-wrap" style="max-width:380px;margin-left:auto;">
+        <div class="game-canvas-inner">
+          <div class="star-layer"></div>
+          <div class="hud-bar">
+            <div class="health-bar">
+              <span>HP</span><div class="health-fill"><div class="health-fill-inner"></div></div>
+            </div>
+            <span>SCORE: 3600</span>
+            <span>LVL: 5</span>
+          </div>
+          <div class="enemy-row" style="top:14%;">
+            <div class="enemy"><svg viewBox="0 0 20 20"><polygon points="10,2 18,16 2,16" fill="#FF6B00"/><rect x="7" y="12" width="2" height="4" fill="#FFA500"/><rect x="11" y="12" width="2" height="4" fill="#FFA500"/></svg></div>
+            <div class="enemy"><svg viewBox="0 0 20 20"><polygon points="10,2 18,16 2,16" fill="#FF6B00"/><rect x="7" y="12" width="2" height="4" fill="#FFA500"/><rect x="11" y="12" width="2" height="4" fill="#FFA500"/></svg></div>
+            <div class="enemy"><svg viewBox="0 0 20 20"><polygon points="10,2 18,16 2,16" fill="#FF6B00"/><rect x="7" y="12" width="2" height="4" fill="#FFA500"/><rect x="11" y="12" width="2" height="4" fill="#FFA500"/></svg></div>
+            <div class="enemy"><svg viewBox="0 0 20 20"><polygon points="10,2 18,16 2,16" fill="#FF6B00"/><rect x="7" y="12" width="2" height="4" fill="#FFA500"/><rect x="11" y="12" width="2" height="4" fill="#FFA500"/></svg></div>
+            <div class="enemy"><svg viewBox="0 0 20 20"><polygon points="10,2 18,16 2,16" fill="#FF6B00"/><rect x="7" y="12" width="2" height="4" fill="#FFA500"/><rect x="11" y="12" width="2" height="4" fill="#FFA500"/></svg></div>
+          </div>
+          <div class="explosion" style="top:26%;left:58%;animation-delay:0.4s;"></div>
+          <div class="bullet" style="left:43%;"></div>
+          <div class="bullet2" style="left:57%;animation-delay:0.6s;"></div>
+          <div class="player-ship">
+            <svg viewBox="0 0 28 36"><polygon points="14,2 26,30 14,24 2,30" fill="#00D68F"/><polygon points="14,2 20,22 14,18 8,22" fill="#00F5A0" opacity="0.8"/><rect x="11" y="24" width="6" height="8" fill="#00A870"/></svg>
+          </div>
+          <div class="canvas-label">FINAL GAME — DAY 10</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 70/30 Rule -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:0;">
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:28px;display:flex;gap:20px;align-items:center;">
+        <div style="flex-shrink:0;text-align:center;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:48px;color:var(--orange);line-height:1;">70<span style="font-size:28px;">%</span></div>
+          <div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-top:4px;">Visuals &amp; Action</div>
+        </div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.7;">Students <strong style="color:var(--white)">see their code come alive</strong> on screen every single session. Every concept is visible, playable, and real.</div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:28px;display:flex;gap:20px;align-items:center;">
+        <div style="flex-shrink:0;text-align:center;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:48px;color:var(--teal);line-height:1;">30<span style="font-size:28px;">%</span></div>
+          <div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-top:4px;">Syntax &amp; Theory</div>
+        </div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.7;">Syntax is introduced <strong style="color:var(--white)">only when students need it</strong> to build the next feature they're excited about.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ TEACHING PHILOSOPHY ═══════════════ -->
+<section style="padding-bottom:64px;">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="label">Teaching Philosophy</div>
+      <h2>REFRAME EVERYTHING</h2>
+      <p>The words you use change everything about how students feel about code.</p>
+    </div>
+    <div class="philosophy-strip reveal">
+      <div class="phil-card">
+        <div class="phil-label">❌ Old Way</div>
+        <div class="phil-old">"Today we study loops."</div>
+        <div class="phil-old">"Today we study conditions."</div>
+        <div class="phil-old">"Today we study functions."</div>
+        <div class="phil-old">"Today we study lists."</div>
+        <div class="phil-old">"Today we study variables."</div>
+      </div>
+      <div class="phil-card contrast">
+        <div class="phil-label" style="color:var(--teal);">✅ New Way</div>
+        <div class="phil-new" style="margin-bottom:6px;">Today we make <span>enemies move forever.</span></div>
+        <div class="phil-new" style="margin-bottom:6px;">Today we teach the game to <span>make decisions.</span></div>
+        <div class="phil-new" style="margin-bottom:6px;">Today we give the ship <span>special abilities.</span></div>
+        <div class="phil-new" style="margin-bottom:6px;">Today we launch <span>50 bullets at once.</span></div>
+        <div class="phil-new">Today the game learns to <span>remember things.</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="sep">
+
+<!-- ═══════════════ DAILY CLASS STRUCTURE ═══════════════ -->
+<section class="structure-section">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="label">Every Day · Every Class</div>
+      <h2>THE 90-MIN FORMULA</h2>
+      <p>Each day follows the same rhythm. Students always know what's coming next.</p>
+    </div>
+    <div class="struct-flow reveal">
+      <div class="struct-step">
+        <div class="struct-time">10m</div>
+        <div class="struct-name">Story Hook</div>
+        <div class="struct-desc">A narrative intro that makes the concept feel alive and necessary</div>
+      </div>
+      <div class="struct-step">
+        <div class="struct-time">20m</div>
+        <div class="struct-name">Teach Concept</div>
+        <div class="struct-desc">Live explanation with visuals — minimum syntax, maximum clarity</div>
+      </div>
+      <div class="struct-step">
+        <div class="struct-time">30m</div>
+        <div class="struct-name">Build Feature</div>
+        <div class="struct-desc">Students code the new game feature alongside the instructor</div>
+      </div>
+      <div class="struct-step">
+        <div class="struct-time">20m</div>
+        <div class="struct-name">Modify Challenge</div>
+        <div class="struct-desc">Change speed, add enemies, tweak score — ownership through customisation</div>
+      </div>
+      <div class="struct-step">
+        <div class="struct-time">10m</div>
+        <div class="struct-name">Showcase</div>
+        <div class="struct-desc">Each student shows what they built. XP awarded. Badges earned.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="sep">
+
+<!-- ═══════════════ 10-DAY TIMELINE ═══════════════ -->
+<section style="padding-bottom:80px;">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="label">The 10-Day Curriculum</div>
+      <h2>ONE GAME, TEN STAGES</h2>
+      <p>Watch Galaxy Defender grow from a blank screen to a fully playable game — one concept at a time.</p>
+    </div>
+
+    <div class="timeline">
+      <div class="timeline-track"></div>
+
+      <!-- DAY 1 -->
+      <div class="day-card reveal">
+        <div class="day-left">
+          <div class="day-inner">
+            <div class="day-theme" style="color:var(--orange);">The Origin Story</div>
+            <div class="day-title">The Story of<br>Programming</div>
+            <div class="day-subtitle">No code today. Just wonder. Students discover WHY programming exists, HOW computers think, and see the final Galaxy Defender game for the first time. The mission is set.</div>
+            <div class="day-concept">
+              <div class="concept-icon">🎯</div>
+              <div class="concept-text"><strong>Goal:</strong> Leave class thinking "I want to build THAT." Students should feel the excitement of what's possible — not overwhelmed by syntax.</div>
+            </div>
+            <div class="day-concept">
+              <div class="concept-icon">🤖</div>
+              <div class="concept-text"><strong>Robot Waiter Activity:</strong> One student is the "robot." Others must give EXACT instructions to move, pick up, turn. Teaches precision and logic without any code.</div>
+            </div>
+            <div class="day-concept">
+              <div class="concept-icon">🎮</div>
+              <div class="concept-text"><strong>Game Demo:</strong> Show the completed Galaxy Defender. Explain: "Every line of this game, you will write yourself over the next 9 days."</div>
+            </div>
+            <div style="margin-top:16px;padding:12px;background:var(--orange-glow);border:1px dashed rgba(255,107,0,0.3);border-radius:8px;">
+              <div style="font-size:11px;font-weight:600;color:var(--orange);margin-bottom:4px;">TEACHER NOTE</div>
+              <div style="font-size:12px;color:var(--muted);">Cover: Machine language → Assembly → C → C++ → Java → Python. Why Python won. Companies that use it (Google, Netflix, Instagram). What a game engine is.</div>
+            </div>
+          </div>
+        </div>
+        <div class="day-center">
+          <div class="day-node" title="Day 1">01</div>
+        </div>
+        <div class="day-right">
+          <div style="padding-top:24px;">
+            <div style="background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:20px;">
+              <div style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;">Game State: Day 1</div>
+              <div style="background:#040810;border-radius:8px;aspect-ratio:16/10;display:flex;align-items:center;justify-content:center;border:1px dashed rgba(255,255,255,0.08);flex-direction:column;gap:8px;">
+                <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(255,107,0,0.6);">BLANK CANVAS</div>
+                <div style="font-size:11px;color:var(--muted);">Just a black screen.</div>
+                <div style="font-size:11px;color:var(--muted);">But the dream is planted. 🚀</div>
+              </div>
+              <div style="margin-top:12px;">
+                <div style="font-size:11px;color:var(--muted);margin-bottom:8px;font-weight:600;">Today's Concepts:</div>
+                <div style="display:flex;flex-wrap:wrap;gap:6px;">
+                  <span class="tag tag-orange">History of code</span>
+                  <span class="tag tag-teal">Why Python</span>
+                  <span class="tag tag-purple">Game engines</span>
+                  <span class="tag tag-orange">Precision & logic</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DAY 2 -->
+      <div class="day-card reveal">
+        <div class="day-left">
+          <div style="padding-top:24px;">
+            <div style="background:var(--card2);border:1px solid var(--border-teal);border-radius:12px;padding:20px;">
+              <div style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;">Game State: Day 2</div>
+              <div style="background:#040810;border-radius:8px;aspect-ratio:16/10;position:relative;overflow:hidden;border:1px solid rgba(0,214,143,0.15);">
+                <div class="star-layer" style="opacity:0.5;"></div>
+                <div style="position:absolute;bottom:20%;left:50%;transform:translateX(-50%);text-align:center;">
+                  <svg width="24" height="30" viewBox="0 0 28 36"><polygon points="14,2 26,30 14,24 2,30" fill="#00D68F"/></svg>
+                  <div style="font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--teal);margin-top:2px;">ALI</div>
+                </div>
+                <div style="position:absolute;top:6px;left:8px;font-family:'JetBrains Mono',monospace;font-size:7px;color:rgba(0,214,143,0.6);">PLAYER: ALI | SHIP: THUNDER</div>
+              </div>
+              <div style="margin-top:12px;">
+                <div style="font-size:11px;color:var(--muted);margin-bottom:8px;font-weight:600;">Feature Added:</div>
+                <div style="font-size:12px;color:var(--teal);">✦ Player appears on screen with their name<br>✦ Ship name and age stored as variables</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="day-center">
+          <div class="day-node teal-node" title="Day 2">02</div>
+        </div>
+        <div class="day-right">
+          <div class="day-inner teal-card">
+            <div class="day-theme" style="color:var(--teal);">Variables & Memory</div>
+            <div class="day-title">Teaching the Game<br>to Remember</div>
+            <div class="day-subtitle">Students build the player identity system. They type their name — and it appears on screen in the game. Variables stop being abstract boxes and become <em>real things they can see</em>.</div>
+            <div class="day-concept">
+              <div class="concept-icon">📦</div>
+              <div class="concept-text"><strong>The Box Metaphor:</strong> "A variable is a labelled box. <code style="color:var(--teal);">score = 0</code> means 'put 0 inside the box named score.'"</div>
+            </div>
+            <div class="day-concept">
+              <div class="concept-icon">🎮</div>
+              <div class="concept-text"><strong>What they build:</strong> Name Tag Simulator → Player enters name, pilot rank, and ship name. Game displays animated intro card. First moment of "MY code is on screen."</div>
+            </div>
+            <div class="code-block">
+<span class="code-comment"># Galaxy Defender — Day 2</span>
+<span class="code-keyword">import</span> pygame
+
+player_name = <span class="code-func">input</span>(<span class="code-string">"Enter your name: "</span>)
+ship_name   = <span class="code-func">input</span>(<span class="code-string">"Name your ship: "</span>)
+score       = <span class="code-num">0</span>
+health      = <span class="code-num">100</span>
+
+<span class="code-comment"># Display on screen</span>
+screen.<span class="code-func">blit</span>(font.<span class="code-func">render</span>(player_name, <span class="code-keyword">True</span>, WHITE), (<span class="code-num">10</span>, <span class="code-num">10</span>))
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DAY 3 -->
+      <div class="day-card reveal">
+        <div class="day-left">
+          <div class="day-inner">
+            <div class="day-theme" style="color:var(--orange);">Maths & Damage</div>
+            <div class="day-title">The Game Learns<br>to Calculate</div>
+            <div class="day-subtitle">The health bar appears. The score counter ticks. Students see maths happening in real time — and suddenly arithmetic isn't boring, it's the reason their ship survives.</div>
+            <div class="day-concept">
+              <div class="concept-icon">💊</div>
+              <div class="concept-text"><strong>Damage System:</strong> <code style="color:var(--orange);">health = health - 10</code> shows visually as the health bar shrinking. Operations become cause and effect.</div>
+            </div>
+            <div class="day-concept">
+              <div class="concept-icon">🔄</div>
+              <div class="concept-text"><strong>Typecasting explained as:</strong> "Translating between human language and machine language." int(), str(), float() — necessary for the score display to work.</div>
+            </div>
+            <div class="code-block">
+<span class="code-comment"># Health & Score System</span>
+health      = <span class="code-num">100</span>
+damage      = <span class="code-num">10</span>
+score       = <span class="code-num">0</span>
+kill_reward = <span class="code-num">50</span>
+
+<span class="code-comment"># When hit</span>
+health = health - damage
+
+<span class="code-comment"># When enemy killed</span>
+score  = score + kill_reward
+
+<span class="code-comment"># Display</span>
+label = <span class="code-string">"SCORE: "</span> + <span class="code-func">str</span>(score)
+            </div>
+          </div>
+        </div>
+        <div class="day-center">
+          <div class="day-node" title="Day 3">03</div>
+        </div>
+        <div class="day-right">
+          <div style="padding-top:24px;">
+            <div style="background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:20px;">
+              <div style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;">Game State: Day 3</div>
+              <div style="background:#040810;border-radius:8px;aspect-ratio:16/10;position:relative;overflow:hidden;border:1px solid var(--border);">
+                <div class="star-layer" style="opacity:0.5;"></div>
+                <div style="position:absolute;top:0;left:0;right:0;background:rgba(0,0,0,0.7);padding:4px 8px;display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--teal);">
+                  <span>HP ████████░░ 80</span>
+                  <span>SCORE: 150</span>
+                </div>
+                <div style="position:absolute;bottom:20%;left:50%;transform:translateX(-50%);">
+                  <svg width="20" height="26" viewBox="0 0 28 36"><polygon points="14,2 26,30 14,24 2,30" fill="#00D68F"/></svg>
+                </div>
+              </div>
+              <div style="margin-top:12px;">
+                <div style="font-size:12px;color:var(--teal);">✦ Health bar now visible<br>✦ Score counter live on screen<br>✦ Damage reduces health visually</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DAY 4 -->
+      <div class="day-card reveal">
+        <div class="day-left">
+          <div style="padding-top:24px;">
+            <div style="background:var(--card2);border:1px solid var(--border-teal);border-radius:12px;padding:20px;">
+              <div style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;">Game State: Day 4</div>
+              <div style="background:#040810;border-radius:8px;aspect-ratio:16/10;position:relative;overflow:hidden;border:1px solid rgba(0,214,143,0.15);">
+                <div class="star-layer" style="opacity:0.5;"></div>
+                <div style="position:absolute;top:0;left:0;right:0;background:rgba(0,0,0,0.7);padding:4px 8px;display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--teal);">
+                  <span>HP ████░░░░░░ 40</span><span>SCORE: 450</span>
+                </div>
+                <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;">
+                  <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;color:#FC8181;letter-spacing:0.1em;">GAME OVER</div>
+                  <div style="font-family:'JetBrains Mono',monospace;font-size:6px;color:var(--muted);margin-top:2px;">health &lt;= 0</div>
+                </div>
+              </div>
+              <div style="margin-top:12px;">
+                <div style="font-size:12px;color:var(--teal);">✦ Game Over screen appears<br>✦ Shield activates on SPACE key<br>✦ Wrong zone = damage triggered</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="day-center">
+          <div class="day-node teal-node" title="Day 4">04</div>
+        </div>
+        <div class="day-right">
+          <div class="day-inner teal-card">
+            <div class="day-theme" style="color:var(--teal);">Decision Making</div>
+            <div class="day-title">Teaching the Game<br>to Think</div>
+            <div class="day-subtitle">The game starts making decisions. Health drops to zero? GAME OVER screen fires. Player enters a danger zone? Damage triggers. The if/elif/else becomes the brain of the game.</div>
+            <div class="day-concept">
+              <div class="concept-icon">🧠</div>
+              <div class="concept-text"><strong>Rules Metaphor:</strong> "Conditions are the rules of your game world." <code style="color:var(--teal);">if health &lt;= 0:</code> means "if the player dies, do this."</div>
+            </div>
+            <div class="day-concept">
+              <div class="concept-icon">🏆</div>
+              <div class="concept-text"><strong>Quiz Battle Activity:</strong> Answer correctly → attack enemy on screen. Wrong → lose health. Concepts and game mechanics are now the same thing.</div>
+            </div>
+            <div class="code-block">
+<span class="code-comment"># Game decision system</span>
+<span class="code-keyword">if</span> health &lt;= <span class="code-num">0</span>:
+    game_state = <span class="code-string">"GAME_OVER"</span>
+    <span class="code-func">show_game_over</span>()
+
+<span class="code-keyword">elif</span> health &lt; <span class="code-num">30</span>:
+    <span class="code-comment"># Flash health bar red</span>
+    health_color = RED
+
+<span class="code-keyword">else</span>:
+    health_color = GREEN
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DAY 5 -->
+      <div class="day-card reveal">
+        <div class="day-left">
+          <div class="day-inner">
+            <div class="day-theme" style="color:var(--orange);">The Heartbeat</div>
+            <div class="day-title">Everything Starts<br>Moving</div>
+            <div class="day-subtitle">The most important day. The game loop is introduced — and suddenly EVERYTHING moves. Stars scroll. The player ship responds. The game feels alive for the first time.</div>
+            <div class="day-concept">
+              <div class="concept-icon">❤️</div>
+              <div class="concept-text"><strong>The Heartbeat Metaphor:</strong> "A while loop is the heartbeat of the game. Without it — everything freezes. With it — everything moves forever."</div>
+            </div>
+            <div class="day-concept">
+              <div class="concept-icon">🔁</div>
+              <div class="concept-text"><strong>Demo contrast:</strong> First show game WITHOUT the loop — students see a frozen frame. Then add the loop — suddenly things move. That contrast is unforgettable.</div>
+            </div>
+            <div class="code-block">
+<span class="code-comment"># The Game Loop — the heartbeat</span>
+running = <span class="code-keyword">True</span>
+
+<span class="code-keyword">while</span> running:
+    <span class="code-comment"># 1. Handle inputs</span>
+    <span class="code-keyword">for</span> event <span class="code-keyword">in</span> pygame.<span class="code-func">event.get</span>():
+        <span class="code-keyword">if</span> event.type == QUIT:
+            running = <span class="code-keyword">False</span>
+
+    <span class="code-comment"># 2. Move player</span>
+    player_x += speed
+
+    <span class="code-comment"># 3. Draw everything</span>
+    <span class="code-func">draw_player</span>()
+    pygame.display.<span class="code-func">update</span>()
+            </div>
+          </div>
+        </div>
+        <div class="day-center">
+          <div class="day-node" title="Day 5">05</div>
+        </div>
+        <div class="day-right">
+          <div style="padding-top:24px;">
+            <div style="background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:20px;">
+              <div style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;">Game State: Day 5</div>
+              <div style="background:#040810;border-radius:8px;aspect-ratio:16/10;position:relative;overflow:hidden;border:1px solid var(--border);">
+                <div class="star-layer" style="opacity:0.6;"></div>
+                <div style="position:absolute;top:0;left:0;right:0;background:rgba(0,0,0,0.7);padding:4px 8px;font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--teal);display:flex;justify-content:space-between;">
+                  <span>HP ██████████ 100</span><span>SCORE: 0</span>
+                </div>
+                <div style="position:absolute;bottom:20%;left:50%;transform:translateX(-50%);">
+                  <svg width="20" height="26" viewBox="0 0 28 36"><polygon points="14,2 26,30 14,24 2,30" fill="#00D68F"/></svg>
+                </div>
+                <div style="position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(to right,transparent,var(--teal),transparent);opacity:0.3;"></div>
+              </div>
+              <div style="margin-top:12px;">
+                <div style="font-size:12px;color:var(--teal);">✦ Player ship moves left/right<br>✦ Stars scroll downward<br>✦ Game loop running — 60 FPS</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DAY 6 -->
+      <div class="day-card reveal">
+        <div class="day-left">
+          <div style="padding-top:24px;">
+            <div style="background:var(--card2);border:1px solid var(--border-teal);border-radius:12px;padding:20px;">
+              <div style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;">Game State: Day 6</div>
+              <div style="background:#040810;border-radius:8px;aspect-ratio:16/10;position:relative;overflow:hidden;border:1px solid rgba(0,214,143,0.15);">
+                <div class="star-layer" style="opacity:0.5;"></div>
+                <div style="position:absolute;top:0;left:0;right:0;background:rgba(0,0,0,0.7);padding:4px 8px;font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--teal);display:flex;justify-content:space-between;">
+                  <span>HP ██████████</span><span>SCORE: 200</span>
+                </div>
+                <!-- Enemy -->
+                <div style="position:absolute;top:20%;left:30%;">
+                  <svg width="16" height="16" viewBox="0 0 20 20"><polygon points="10,2 18,16 2,16" fill="#FF6B00"/></svg>
+                </div>
+                <div style="position:absolute;top:20%;right:30%;">
+                  <svg width="16" height="16" viewBox="0 0 20 20"><polygon points="10,2 18,16 2,16" fill="#FF6B00"/></svg>
+                </div>
+                <!-- Bullet -->
+                <div style="position:absolute;left:calc(50% - 1px);bottom:30%;width:2px;height:10px;background:var(--teal);border-radius:2px;box-shadow:0 0 4px var(--teal);"></div>
+                <div style="position:absolute;bottom:20%;left:50%;transform:translateX(-50%);">
+                  <svg width="18" height="22" viewBox="0 0 28 36"><polygon points="14,2 26,30 14,24 2,30" fill="#00D68F"/></svg>
+                </div>
+              </div>
+              <div style="margin-top:12px;">
+                <div style="font-size:12px;color:var(--teal);">✦ Enemies appear and move<br>✦ Player can SHOOT (SPACE key)<br>✦ Functions power every action</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="day-center">
+          <div class="day-node teal-node" title="Day 6">06</div>
+        </div>
+        <div class="day-right">
+          <div class="day-inner teal-card">
+            <div class="day-theme" style="color:var(--teal);">Reusable Powers</div>
+            <div class="day-title">The Ship Gets<br>Special Abilities</div>
+            <div class="day-subtitle">Functions are introduced as "special abilities" the game can call. shoot_bullet(), spawn_enemy(), draw_player() — students realise they're building a library of powers for their game world.</div>
+            <div class="day-concept">
+              <div class="concept-icon">⚡</div>
+              <div class="concept-text"><strong>Superpower Metaphor:</strong> "Every time your ship presses SPACE, it calls shoot_bullet(). A function is a named superpower you can trigger anywhere."</div>
+            </div>
+            <div class="day-concept">
+              <div class="concept-icon">🏭</div>
+              <div class="concept-text"><strong>Enemy Factory:</strong> A function that creates an enemy at a given position. Call it once and one appears. Call it 10 times — 10 enemies. The power of reuse made visual.</div>
+            </div>
+            <div class="code-block">
+<span class="code-keyword">def</span> <span class="code-func">shoot_bullet</span>(x, y):
+    bullet = {<span class="code-string">'x'</span>: x, <span class="code-string">'y'</span>: y, <span class="code-string">'speed'</span>: <span class="code-num">8</span>}
+    <span class="code-keyword">return</span> bullet
+
+<span class="code-keyword">def</span> <span class="code-func">spawn_enemy</span>(x, y):
+    enemy = {<span class="code-string">'x'</span>: x, <span class="code-string">'y'</span>: y, <span class="code-string">'hp'</span>: <span class="code-num">3</span>}
+    <span class="code-keyword">return</span> enemy
+
+<span class="code-keyword">def</span> <span class="code-func">draw_player</span>(surface, x, y):
+    pygame.<span class="code-func">draw.polygon</span>(surface, GREEN,
+        [(x, y), (x<span class="code-num">-20</span>, y<span class="code-num">+40</span>), (x<span class="code-num">+20</span>, y<span class="code-num">+40</span>)])
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DAY 7 -->
+      <div class="day-card reveal">
+        <div class="day-left">
+          <div class="day-inner">
+            <div class="day-theme" style="color:var(--orange);">Teams & Armies</div>
+            <div class="day-title">One Bullet Becomes<br>a Blizzard</div>
+            <div class="day-subtitle">Lists unlock the most exciting upgrade yet — the player can fire MULTIPLE bullets simultaneously. Students go from one bullet that disappears to a stream of projectiles flying across the screen.</div>
+            <div class="day-concept">
+              <div class="concept-icon">👥</div>
+              <div class="concept-text"><strong>Team Metaphor:</strong> "A list is a team. Instead of one bullet — a whole squad. Instead of one coin — a bag full of coins. Lists let you manage MANY things at once."</div>
+            </div>
+            <div class="day-concept">
+              <div class="concept-icon">🌧️</div>
+              <div class="concept-text"><strong>Asteroid Rain:</strong> Store 20 asteroids in a list. Loop through them all. Move them all. Remove them when off-screen. The list is the reason this is even possible.</div>
+            </div>
+            <div class="code-block">
+<span class="code-comment"># Bullet list</span>
+bullets = []
+
+<span class="code-comment"># On SPACE press</span>
+<span class="code-keyword">if</span> keys[K_SPACE]:
+    bullets.<span class="code-func">append</span>(<span class="code-func">shoot_bullet</span>(player_x, player_y))
+
+<span class="code-comment"># Move all bullets</span>
+<span class="code-keyword">for</span> bullet <span class="code-keyword">in</span> bullets:
+    bullet[<span class="code-string">'y'</span>] -= bullet[<span class="code-string">'speed'</span>]
+
+<span class="code-comment"># Remove off-screen</span>
+bullets = [b <span class="code-keyword">for</span> b <span class="code-keyword">in</span> bullets <span class="code-keyword">if</span> b[<span class="code-string">'y'</span>] > <span class="code-num">0</span>]
+            </div>
+          </div>
+        </div>
+        <div class="day-center">
+          <div class="day-node" title="Day 7">07</div>
+        </div>
+        <div class="day-right">
+          <div style="padding-top:24px;">
+            <div style="background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:20px;">
+              <div style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;">Game State: Day 7</div>
+              <div style="background:#040810;border-radius:8px;aspect-ratio:16/10;position:relative;overflow:hidden;border:1px solid var(--border);">
+                <div class="star-layer" style="opacity:0.5;"></div>
+                <div style="position:absolute;top:0;left:0;right:0;background:rgba(0,0,0,0.7);padding:4px 8px;font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--teal);display:flex;justify-content:space-between;">
+                  <span>HP ████████░░</span><span>SCORE: 850</span>
+                </div>
+                <!-- Multiple enemies -->
+                <div style="position:absolute;top:18%;left:15%;"><svg width="14" height="14" viewBox="0 0 20 20"><polygon points="10,2 18,16 2,16" fill="#FF6B00"/></svg></div>
+                <div style="position:absolute;top:18%;left:40%;"><svg width="14" height="14" viewBox="0 0 20 20"><polygon points="10,2 18,16 2,16" fill="#FF6B00"/></svg></div>
+                <div style="position:absolute;top:18%;right:20%;"><svg width="14" height="14" viewBox="0 0 20 20"><polygon points="10,2 18,16 2,16" fill="#FF6B00"/></svg></div>
+                <!-- Multiple bullets -->
+                <div style="position:absolute;left:38%;bottom:28%;width:2px;height:8px;background:var(--teal);box-shadow:0 0 4px var(--teal);border-radius:1px;"></div>
+                <div style="position:absolute;left:48%;bottom:38%;width:2px;height:8px;background:var(--teal);box-shadow:0 0 4px var(--teal);border-radius:1px;"></div>
+                <div style="position:absolute;left:54%;bottom:20%;width:2px;height:8px;background:var(--teal);box-shadow:0 0 4px var(--teal);border-radius:1px;"></div>
+                <div style="position:absolute;bottom:18%;left:50%;transform:translateX(-50%);">
+                  <svg width="16" height="20" viewBox="0 0 28 36"><polygon points="14,2 26,30 14,24 2,30" fill="#00D68F"/></svg>
+                </div>
+              </div>
+              <div style="margin-top:12px;">
+                <div style="font-size:12px;color:var(--teal);">✦ bullets = [ ] stores all bullets<br>✦ Multiple bullets fly at once<br>✦ Off-screen bullets removed automatically</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DAY 8 -->
+      <div class="day-card reveal">
+        <div class="day-left">
+          <div style="padding-top:24px;">
+            <div style="background:var(--card2);border:1px solid var(--border-teal);border-radius:12px;padding:20px;">
+              <div style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;">Game State: Day 8</div>
+              <div style="background:#040810;border-radius:8px;aspect-ratio:16/10;position:relative;overflow:hidden;border:1px solid rgba(0,214,143,0.15);">
+                <div class="star-layer" style="opacity:0.5;"></div>
+                <div style="position:absolute;top:0;left:0;right:0;background:rgba(0,0,0,0.7);padding:4px 8px;font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--teal);display:flex;justify-content:space-between;">
+                  <span>HP ██████░░░░</span><span>SCORE: 1800 · WAVE 2</span>
+                </div>
+                <!-- Wave of enemies -->
+                <div style="position:absolute;top:16%;left:0;right:0;display:flex;justify-content:space-around;padding:0 8%;">
+                  <svg width="13" height="13" viewBox="0 0 20 20"><polygon points="10,2 18,16 2,16" fill="#FF6B00"/></svg>
+                  <svg width="13" height="13" viewBox="0 0 20 20"><polygon points="10,2 18,16 2,16" fill="#FF6B00"/></svg>
+                  <svg width="13" height="13" viewBox="0 0 20 20"><polygon points="10,2 18,16 2,16" fill="#FF6B00"/></svg>
+                  <svg width="13" height="13" viewBox="0 0 20 20"><polygon points="10,2 18,16 2,16" fill="#FF6B00"/></svg>
+                  <svg width="13" height="13" viewBox="0 0 20 20"><polygon points="10,2 18,16 2,16" fill="#FF6B00"/></svg>
+                </div>
+                <div style="position:absolute;top:32%;left:20%;right:20%;display:flex;justify-content:space-around;">
+                  <svg width="13" height="13" viewBox="0 0 20 20"><polygon points="10,2 18,16 2,16" fill="#FF4500" opacity="0.7"/></svg>
+                  <svg width="13" height="13" viewBox="0 0 20 20"><polygon points="10,2 18,16 2,16" fill="#FF4500" opacity="0.7"/></svg>
+                  <svg width="13" height="13" viewBox="0 0 20 20"><polygon points="10,2 18,16 2,16" fill="#FF4500" opacity="0.7"/></svg>
+                </div>
+                <div style="position:absolute;bottom:18%;left:50%;transform:translateX(-50%);">
+                  <svg width="16" height="20" viewBox="0 0 28 36"><polygon points="14,2 26,30 14,24 2,30" fill="#00D68F"/></svg>
+                </div>
+              </div>
+              <div style="margin-top:12px;">
+                <div style="font-size:12px;color:var(--teal);">✦ Enemy waves in formation<br>✦ Enemies shoot back<br>✦ Wave counter — game gets harder</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="day-center">
+          <div class="day-node teal-node" title="Day 8">08</div>
+        </div>
+        <div class="day-right">
+          <div class="day-inner teal-card">
+            <div class="day-theme" style="color:var(--teal);">Armies & Waves</div>
+            <div class="day-title">Enemy Waves<br>Invade</div>
+            <div class="day-subtitle">Nested lists power the wave system. Rows of enemies move in formation. When one wave is cleared, the next spawns — harder, faster. The game now has proper progression and challenge.</div>
+            <div class="day-concept">
+              <div class="concept-icon">🏫</div>
+              <div class="concept-text"><strong>Classroom Metaphor:</strong> "A nested list is like a classroom building. The building is the outer list. Each class is an inner list. Each student is an object inside."</div>
+            </div>
+            <div class="day-concept">
+              <div class="concept-icon">🌊</div>
+              <div class="concept-text"><strong>Wave System:</strong> Enemies are stored as a list of lists. When enemies[] is empty, wave number goes up and a new formation spawns — building difficulty naturally.</div>
+            </div>
+            <div class="code-block">
+<span class="code-comment"># Enemy wave system</span>
+wave_1 = [
+    <span class="code-func">spawn_enemy</span>(<span class="code-num">100</span>, <span class="code-num">50</span>),
+    <span class="code-func">spawn_enemy</span>(<span class="code-num">200</span>, <span class="code-num">50</span>),
+    <span class="code-func">spawn_enemy</span>(<span class="code-num">300</span>, <span class="code-num">50</span>),
+]
+
+<span class="code-keyword">if</span> <span class="code-func">len</span>(enemies) == <span class="code-num">0</span>:
+    wave_number += <span class="code-num">1</span>
+    enemies = <span class="code-func">create_wave</span>(wave_number)
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DAY 9 -->
+      <div class="day-card reveal">
+        <div class="day-left">
+          <div class="day-inner">
+            <div class="day-theme" style="color:var(--orange);">Chaos & Surprise</div>
+            <div class="day-title">The Game Becomes<br>Unpredictable</div>
+            <div class="day-subtitle">Randomness makes the game feel truly alive. Enemy positions change every run. Loot drops in different spots. No two games are the same — and students discover their gamer tag using string slicing.</div>
+            <div class="day-concept">
+              <div class="concept-icon">🎲</div>
+              <div class="concept-text"><strong>Chaos Metaphor:</strong> "Randomness = unexpected events. Without it, players learn your pattern in 10 minutes. With it, the game stays fresh forever."</div>
+            </div>
+            <div class="day-concept">
+              <div class="concept-icon">🏷️</div>
+              <div class="concept-text"><strong>Gamer Tag Activity:</strong> <code style="color:var(--orange);">name[:3]</code> creates a 3-letter tag from their name. Students generate secret codes, call signs, usernames — string slicing suddenly has personality.</div>
+            </div>
+            <div class="code-block">
+<span class="code-keyword">import</span> random
+
+<span class="code-comment"># Random enemy spawn</span>
+enemy_x = random.<span class="code-func">randint</span>(<span class="code-num">50</span>, SCREEN_W - <span class="code-num">50</span>)
+enemy_y = random.<span class="code-func">randint</span>(-<span class="code-num">100</span>, -<span class="code-num">30</span>)
+
+<span class="code-comment"># Random loot drop</span>
+<span class="code-keyword">if</span> random.<span class="code-func">randint</span>(<span class="code-num">1</span>, <span class="code-num">100</span>) < <span class="code-num">20</span>:  <span class="code-comment"># 20% chance</span>
+    <span class="code-func">spawn_powerup</span>(enemy_x, enemy_y)
+
+<span class="code-comment"># Gamer tag from name</span>
+gamer_tag = player_name[:<span class="code-num">3</span>].<span class="code-func">upper</span>() + <span class="code-string">"_ACE"</span>
+            </div>
+          </div>
+        </div>
+        <div class="day-center">
+          <div class="day-node" title="Day 9">09</div>
+        </div>
+        <div class="day-right">
+          <div style="padding-top:24px;">
+            <div style="background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:20px;">
+              <div style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;">Game State: Day 9</div>
+              <div style="background:#040810;border-radius:8px;aspect-ratio:16/10;position:relative;overflow:hidden;border:1px solid var(--border);">
+                <div class="star-layer" style="opacity:0.5;"></div>
+                <div style="position:absolute;top:0;left:0;right:0;background:rgba(0,0,0,0.7);padding:4px 8px;font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--teal);display:flex;justify-content:space-between;">
+                  <span>ALI_ACE · WAVE 4</span><span>SCORE: 3200</span>
+                </div>
+                <!-- Random enemies -->
+                <div style="position:absolute;top:15%;left:22%;"><svg width="13" height="13" viewBox="0 0 20 20"><polygon points="10,2 18,16 2,16" fill="#FF6B00"/></svg></div>
+                <div style="position:absolute;top:25%;left:60%;"><svg width="13" height="13" viewBox="0 0 20 20"><polygon points="10,2 18,16 2,16" fill="#FF4500"/></svg></div>
+                <div style="position:absolute;top:20%;left:80%;"><svg width="13" height="13" viewBox="0 0 20 20"><polygon points="10,2 18,16 2,16" fill="#FF6B00"/></svg></div>
+                <!-- Power up -->
+                <div style="position:absolute;top:40%;left:35%;width:10px;height:10px;background:var(--orange);border-radius:50%;box-shadow:0 0 8px var(--orange);"></div>
+                <div style="position:absolute;bottom:18%;left:45%;transform:translateX(-50%);">
+                  <svg width="16" height="20" viewBox="0 0 28 36"><polygon points="14,2 26,30 14,24 2,30" fill="#00D68F"/></svg>
+                </div>
+              </div>
+              <div style="margin-top:12px;">
+                <div style="font-size:12px;color:var(--teal);">✦ Enemies spawn at random positions<br>✦ 20% chance of loot drop<br>✦ Student's gamer tag shown in HUD</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DAY 10 -->
+      <div class="day-card reveal">
+        <div class="day-left">
+          <div style="padding-top:24px;">
+            <div style="background:var(--card2);border:2px solid var(--orange);border-radius:12px;padding:20px;box-shadow:0 0 32px rgba(255,107,0,0.15);">
+              <div style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--orange);margin-bottom:12px;">Game State: Day 10 — FINAL</div>
+              <div style="background:#040810;border-radius:8px;aspect-ratio:16/10;position:relative;overflow:hidden;border:1px solid rgba(255,107,0,0.3);">
+                <div class="star-layer"></div>
+                <div style="position:absolute;top:0;left:0;right:0;background:rgba(0,0,0,0.8);padding:4px 8px;font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--teal);display:flex;justify-content:space-between;border-bottom:1px solid rgba(0,214,143,0.2);">
+                  <span>HP ████████░░</span><span>WAVE 5 · SCORE: 5600</span>
+                </div>
+                <div style="position:absolute;top:14%;left:0;right:0;display:flex;justify-content:space-around;padding:0 5%;">
+                  <svg width="13" height="13" viewBox="0 0 20 20"><polygon points="10,2 18,16 2,16" fill="#FF6B00"/></svg>
+                  <svg width="13" height="13" viewBox="0 0 20 20"><polygon points="10,2 18,16 2,16" fill="#FF6B00"/></svg>
+                  <svg width="13" height="13" viewBox="0 0 20 20"><polygon points="10,2 18,16 2,16" fill="#FF6B00"/></svg>
+                  <svg width="13" height="13" viewBox="0 0 20 20"><polygon points="10,2 18,16 2,16" fill="#FF6B00"/></svg>
+                </div>
+                <div style="position:absolute;top:30%;left:25%;right:25%;display:flex;justify-content:space-around;">
+                  <svg width="16" height="16" viewBox="0 0 20 20"><polygon points="10,2 18,16 2,16" fill="#CC3300"/></svg>
+                  <svg width="16" height="16" viewBox="0 0 20 20"><polygon points="10,2 18,16 2,16" fill="#CC3300"/></svg>
+                </div>
+                <div class="explosion" style="top:30%;left:65%;width:12px;height:12px;"></div>
+                <!-- Multiple bullets -->
+                <div style="position:absolute;left:42%;bottom:30%;width:2px;height:8px;background:var(--teal);box-shadow:0 0 3px var(--teal);border-radius:1px;"></div>
+                <div style="position:absolute;left:52%;bottom:38%;width:2px;height:8px;background:var(--teal);box-shadow:0 0 3px var(--teal);border-radius:1px;"></div>
+                <div style="position:absolute;left:46%;bottom:45%;width:2px;height:8px;background:var(--teal);box-shadow:0 0 3px var(--teal);border-radius:1px;"></div>
+                <!-- Power up -->
+                <div style="position:absolute;top:50%;right:20%;width:8px;height:8px;background:var(--orange);border-radius:50%;box-shadow:0 0 6px var(--orange);"></div>
+                <div style="position:absolute;bottom:18%;left:50%;transform:translateX(-50%);">
+                  <svg width="20" height="26" viewBox="0 0 28 36"><polygon points="14,2 26,30 14,24 2,30" fill="#00D68F"/><polygon points="14,2 20,22 14,18 8,22" fill="#00F5A0" opacity="0.8"/></svg>
+                </div>
+              </div>
+              <div style="margin-top:12px;">
+                <div style="font-size:12px;color:var(--orange);font-weight:600;">The complete Galaxy Defender — built 100% by the student.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="day-center">
+          <div class="day-node purple-node" title="Day 10" style="border-color:var(--orange);color:var(--orange);box-shadow:0 0 24px rgba(255,107,0,0.4);width:56px;height:56px;font-size:20px;">10</div>
+        </div>
+        <div class="day-right">
+          <div class="day-inner" style="border-color:rgba(255,107,0,0.4);box-shadow:0 0 32px rgba(255,107,0,0.1);">
+            <div class="day-theme" style="color:var(--orange);">🏆 Final Project Day</div>
+            <div class="day-title">SHOWCASE YOUR<br>GALAXY DEFENDER</div>
+            <div class="day-subtitle">Everything comes together. Students polish their game, customise it, add their personal touch — then present it to the class. They don't demo code. They <strong>play their game</strong> in front of everyone.</div>
+            <div class="day-concept">
+              <div class="concept-icon">🎤</div>
+              <div class="concept-text"><strong>Presentation format:</strong> Each student shows their game, explains one feature they built, and takes questions. The audience plays their game live.</div>
+            </div>
+            <div class="day-concept">
+              <div class="concept-icon">🎨</div>
+              <div class="concept-text"><strong>Personalisation options:</strong> Custom ship colour, different enemy types, unique sound effects, personal score record, modified difficulty, special abilities — it's truly THEIR game.</div>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;">
+              <span class="tag tag-orange">All 8 Python Concepts</span>
+              <span class="tag tag-teal">Fully Playable</span>
+              <span class="tag tag-purple">Live Showcase</span>
+              <span class="tag tag-orange">Certificate Earned</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end timeline -->
+  </div>
+</section>
+
+<hr class="sep">
+
+<!-- ═══════════════ WHAT THEY BUILD ═══════════════ -->
+<section style="padding-bottom:64px;">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="label">Progressive Build</div>
+      <h2>THE GAME GROWS EVERY DAY</h2>
+      <p>Each concept unlocks a new feature. Students never wait to apply what they learned.</p>
+    </div>
+    <div class="build-stages reveal">
+      <div class="stage-card">
+        <div class="stage-num">DAYS 1-2</div>
+        <div class="stage-title">Identity Layer</div>
+        <div class="stage-adds">Player appears on screen with their name and ship name</div>
+        <div class="stage-chip">print · variables · input</div>
+      </div>
+      <div class="stage-card" style="border-bottom-color:var(--teal);">
+        <div class="stage-num" style="color:var(--teal);">DAY 3</div>
+        <div class="stage-title">Stats System</div>
+        <div class="stage-adds">Health bar, score counter, damage calculations visible live</div>
+        <div class="stage-chip teal">int · str · operators</div>
+      </div>
+      <div class="stage-card">
+        <div class="stage-num">DAY 4</div>
+        <div class="stage-title">Game Brain</div>
+        <div class="stage-adds">Game Over screen, shield logic, zone detection — the game makes decisions</div>
+        <div class="stage-chip">if · elif · else</div>
+      </div>
+      <div class="stage-card" style="border-bottom-color:var(--teal);">
+        <div class="stage-num" style="color:var(--teal);">DAY 5</div>
+        <div class="stage-title">Everything Moves</div>
+        <div class="stage-adds">Game loop running. Player ships flies. Stars scroll. 60 FPS achieved.</div>
+        <div class="stage-chip teal">while · for · loop</div>
+      </div>
+      <div class="stage-card" style="border-bottom-color:#A78BFA;">
+        <div class="stage-num" style="color:#A78BFA;">DAY 6</div>
+        <div class="stage-title">Special Abilities</div>
+        <div class="stage-adds">Shooting, spawning, drawing — all powered by reusable functions</div>
+        <div class="stage-chip" style="background:rgba(167,139,250,0.12);color:#A78BFA;">def · params · return</div>
+      </div>
+      <div class="stage-card">
+        <div class="stage-num">DAY 7</div>
+        <div class="stage-title">Bullet Blizzard</div>
+        <div class="stage-adds">Multiple bullets fly simultaneously. Asteroid rain. The screen fills with action.</div>
+        <div class="stage-chip">list · append · remove</div>
+      </div>
+      <div class="stage-card" style="border-bottom-color:var(--teal);">
+        <div class="stage-num" style="color:var(--teal);">DAY 8</div>
+        <div class="stage-title">Enemy Waves</div>
+        <div class="stage-adds">Formations of enemies. Wave counter. Game gets harder over time.</div>
+        <div class="stage-chip teal">nested lists · iteration</div>
+      </div>
+      <div class="stage-card">
+        <div class="stage-num">DAY 9</div>
+        <div class="stage-title">Unpredictability</div>
+        <div class="stage-adds">Random spawns, loot drops, gamer tags — no two games are the same</div>
+        <div class="stage-chip">random · slicing</div>
+      </div>
+      <div class="stage-card" style="border-bottom-color:var(--orange);grid-column:span 2;">
+        <div class="stage-num">DAY 10</div>
+        <div class="stage-title">Galaxy Defender — Complete</div>
+        <div class="stage-adds">All systems integrated. Personalised. Polished. Presented to the class. Certificates awarded. Students leave saying "I made a game" — not "I learned Chapter 3."</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;">
+          <span class="stage-chip">Full game</span>
+          <span class="stage-chip teal">Live showcase</span>
+          <span class="stage-chip" style="background:rgba(167,139,250,0.12);color:#A78BFA;">Certificate</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ XP & BADGES ═══════════════ -->
+<section style="padding-bottom:64px;">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="label">Gamification System</div>
+      <h2>EARN XP. UNLOCK RANKS.</h2>
+      <p>The learning itself is gamified. Students earn XP, unlock badges, and climb ranks — every single day.</p>
+    </div>
+    <div class="badges-grid reveal">
+      <div class="badge"><div class="badge-icon">🐛</div><div><div class="badge-xp">+50 XP</div><div style="font-size:11px;color:var(--muted);">Debugging Ninja</div></div></div>
+      <div class="badge"><div class="badge-icon">🔁</div><div><div class="badge-xp">+75 XP</div><div style="font-size:11px;color:var(--muted);">Loop Master</div></div></div>
+      <div class="badge"><div class="badge-icon">⚔️</div><div><div class="badge-xp">+100 XP</div><div style="font-size:11px;color:var(--muted);">Python Warrior</div></div></div>
+      <div class="badge"><div class="badge-icon">🚀</div><div><div class="badge-xp">+60 XP</div><div style="font-size:11px;color:var(--muted);">First Ship Launch</div></div></div>
+      <div class="badge"><div class="badge-icon">🌊</div><div><div class="badge-xp">+80 XP</div><div style="font-size:11px;color:var(--muted);">Wave Crusher</div></div></div>
+      <div class="badge"><div class="badge-icon">🎯</div><div><div class="badge-xp">+90 XP</div><div style="font-size:11px;color:var(--muted);">Function Sniper</div></div></div>
+      <div class="badge"><div class="badge-icon">⚡</div><div><div class="badge-xp">+120 XP</div><div style="font-size:11px;color:var(--muted);">Speed Coder</div></div></div>
+      <div class="badge"><div class="badge-icon">🏆</div><div><div class="badge-xp">+500 XP</div><div style="font-size:11px;color:var(--muted);">Galaxy Defender</div></div></div>
+      <div class="badge"><div class="badge-icon">🎲</div><div><div class="badge-xp">+70 XP</div><div style="font-size:11px;color:var(--muted);">Chaos Engineer</div></div></div>
+      <div class="badge"><div class="badge-icon">🧠</div><div><div class="badge-xp">+85 XP</div><div style="font-size:11px;color:var(--muted);">Logic Legend</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ FINAL QUOTE ═══════════════ -->
+<section style="padding:48px 0 80px;">
+  <div class="container">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:48px;text-align:center;position:relative;overflow:hidden;">
+      <div style="position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(circle at 50% 0%, rgba(255,107,0,0.06) 0%, transparent 70%);pointer-events:none;"></div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:56px;color:var(--orange);line-height:1;margin-bottom:16px;">"</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,4vw,42px);color:var(--white);letter-spacing:0.04em;line-height:1.2;margin-bottom:24px;">
+        Students leave saying<br><span style="color:var(--teal);">"I MADE A GAME"</span><br>— not "I learned Chapter 3."
+      </div>
+      <div style="font-size:13px;color:var(--muted);max-width:480px;margin:0 auto;">
+        Begin with curiosity. Begin with visuals. Begin with stories. Every concept is a feature they've been waiting to unlock.
+      </div>
+      <div style="margin-top:32px;display:flex;justify-content:center;gap:16px;flex-wrap:wrap;">
+        <div class="pill"><div class="pill-dot orange"></div>ASHREI Tech Summer Camp</div>
+        <div class="pill"><div class="pill-dot teal"></div>Python + Pygame</div>
+        <div class="pill"><div class="pill-dot purple"></div>10 Days · 1 Game · Infinite Possibility</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ FOOTER ═══════════════ -->
+<footer style="border-top:1px solid var(--border);padding:32px 0;">
+  <div class="container">
+    <div class="footer">
+      <div>
+        <div class="footer-brand">ASHREI TECH · NASTP</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px;">Python Game Development Bootcamp — Curriculum Flow</div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);">10 Days · 8 Concepts · 1 Complete Game</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(255,107,0,0.5);margin-top:4px;">galaxy_defender.py ✓</div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Scroll reveal
+const reveals = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+reveals.forEach(el => observer.observe(el));
+
+// Stagger day cards
+document.querySelectorAll('.day-card').forEach((card, i) => {
+  card.style.transitionDelay = `${i * 0.05}s`;
+});
+</script>
+</body>
+</html>
