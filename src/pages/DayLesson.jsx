@@ -32,7 +32,7 @@ function GamePreview({ day }) {
 // Mission header with story
 function MissionHeader({ day }) {
   return (
-    <div style={{ borderRadius:22, padding:'34px 32px', background:`linear-gradient(135deg, ${day.color}18, rgba(255,255,255,0.02))`, border:`1px solid ${day.color}45`, marginBottom:28, position:'relative', overflow:'hidden' }}>
+    <div className="mission-header" style={{ borderRadius:22, padding:'28px 24px', background:`linear-gradient(135deg, ${day.color}18, rgba(255,255,255,0.02))`, border:`1px solid ${day.color}45`, marginBottom:28, position:'relative', overflow:'hidden' }}>
       <div style={{ position:'absolute', top:0, right:0, width:200, height:200, background:`radial-gradient(circle at 100% 0%, ${day.color}15 0%, transparent 60%)`, pointerEvents:'none' }} />
       {/* Tags row */}
       <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:18, flexWrap:'wrap' }}>
@@ -186,7 +186,7 @@ export default function DayLesson({ day, setView, setSelectedDay }) {
   const nextUnlocked = nextDay && state.unlockedDays.includes(nextDay.id);
 
   return (
-    <div style={{ maxWidth:900, margin:'0 auto', padding:'40px 24px', position:'relative', zIndex:1 }} className="page-enter day-lesson-wrap">
+    <div style={{ maxWidth:900, margin:'0 auto', padding:'40px 24px 80px', position:'relative', zIndex:1 }} className="page-enter day-lesson-wrap">
 
       {/* Back button */}
       <button onClick={() => { setView('lessons'); setSelectedDay(null); }} style={{ background:'rgba(255,255,255,0.04)', border:'1px solid rgba(255,255,255,0.12)', borderRadius:8, padding:'8px 18px', color:'rgba(255,255,255,0.55)', cursor:'pointer', fontSize:13, marginBottom:32, fontFamily:'inherit' }}>

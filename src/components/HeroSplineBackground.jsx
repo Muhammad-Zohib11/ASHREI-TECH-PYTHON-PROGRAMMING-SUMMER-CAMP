@@ -32,8 +32,8 @@ export default function HeroSplineBackground() {
 
   // Defer mounting by 400ms so the first paint/LCP isn't blocked
   useEffect(() => {
-    // Skip on low-end mobile to prevent FPS drops
-    if (isMobile.current && navigator.hardwareConcurrency <= 4) {
+    // Skip Spline entirely on all mobile — too heavy (8.6MB), causes FPS drops
+    if (isMobile.current) {
       return; // stay unmounted → shows CSS fallback only
     }
     const id = setTimeout(() => setMounted(true), 400);

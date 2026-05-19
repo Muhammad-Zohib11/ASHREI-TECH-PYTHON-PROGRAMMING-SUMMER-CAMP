@@ -24,7 +24,7 @@ export default function LandingPage({ setView, setSelectedDay }) {
     <div style={{ position:'relative', zIndex:1 }} className="page-enter">
 
       {/* ── HERO ── */}
-      <section style={{ minHeight:'92vh', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', padding:'80px 24px', textAlign:'center', position:'relative', overflow:'hidden' }}>
+      <section className="hero-section" style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', padding:'80px 24px', textAlign:'center', position:'relative', overflow:'hidden' }}>
 
         {/* 3D Spline background — sits behind all content */}
         <HeroSplineBackground />
@@ -33,7 +33,7 @@ export default function LandingPage({ setView, setSelectedDay }) {
         <div style={{ position:'relative', zIndex:1, width:'100%', display:'flex', flexDirection:'column', alignItems:'center' }}>
 
         {FLOATERS.map((f, i) => (
-          <div key={i} style={{ position:'absolute', left:f.x, top:f.y, fontSize:f.s, animation:`float 4s ease-in-out ${f.d} infinite`, pointerEvents:'none', userSelect:'none', opacity:0.65 }}>{f.e}</div>
+          <div key={i} className="floater-item" style={{ position:'absolute', left:f.x, top:f.y, fontSize:f.s, animation:`float 4s ease-in-out ${f.d} infinite`, pointerEvents:'none', userSelect:'none', opacity:0.65 }}>{f.e}</div>
         ))}
 
         {/* Live badge */}
@@ -63,10 +63,10 @@ export default function LandingPage({ setView, setSelectedDay }) {
         </div>
 
         {/* Stats */}
-        <div style={{ display:'flex', gap:48, marginTop:64, flexWrap:'wrap', justifyContent:'center' }}>
+        <div className="hero-stats" style={{ display:'flex', gap:48, marginTop:64, flexWrap:'wrap', justifyContent:'center' }}>
           {[{ v:'12', l:'Days' }, { v:'6+', l:'Games Built' }, { v:'30+', l:'Skills' }, { v:'12', l:'Badges' }].map((s, i) => (
             <div key={i} style={{ textAlign:'center' }}>
-              <div style={{ fontFamily:'var(--font-head)', fontSize:36, fontWeight:900, color:'#00f5ff', textShadow:'0 0 20px rgba(0,245,255,0.4)' }}>{s.v}</div>
+              <div className="hero-stat-value" style={{ fontFamily:'var(--font-head)', fontSize:36, fontWeight:900, color:'#00f5ff', textShadow:'0 0 20px rgba(0,245,255,0.4)' }}>{s.v}</div>
               <div style={{ color:'rgba(255,255,255,0.4)', fontSize:13, marginTop:4, fontWeight:600 }}>{s.l}</div>
             </div>
           ))}
@@ -76,7 +76,7 @@ export default function LandingPage({ setView, setSelectedDay }) {
       </section>
 
       {/* ── GAME SHOWCASE ── */}
-      <section style={{ padding:'80px 24px', maxWidth:1200, margin:'0 auto' }}>
+      <section className="landing-section" style={{ padding:'80px 24px', maxWidth:1200, margin:'0 auto' }}>
         <div style={{ textAlign:'center', marginBottom:52 }}>
           <SectionLabel color="#00f5ff">WHAT YOU'LL BUILD</SectionLabel>
           <h2 style={{ fontFamily:'var(--font-head)', fontSize:'clamp(26px,4vw,42px)', color:'#fff', fontWeight:800 }}>5 Complete Games</h2>
@@ -99,7 +99,7 @@ export default function LandingPage({ setView, setSelectedDay }) {
       </section>
 
       {/* ── 12-DAY ROADMAP ── */}
-      <section style={{ padding:'80px 24px', maxWidth:900, margin:'0 auto' }}>
+      <section className="landing-section" style={{ padding:'80px 24px', maxWidth:900, margin:'0 auto' }}>
         <div style={{ textAlign:'center', marginBottom:52 }}>
           <SectionLabel color="#8b5cf6">THE JOURNEY</SectionLabel>
           <h2 style={{ fontFamily:'var(--font-head)', fontSize:'clamp(26px,4vw,42px)', color:'#fff', fontWeight:800 }}>12-Day Roadmap</h2>
@@ -108,21 +108,21 @@ export default function LandingPage({ setView, setSelectedDay }) {
         {completedCount > 0 && (
           <div style={{ textAlign:'center', marginBottom:32 }}>
             <div style={{ color:'rgba(255,255,255,0.35)', fontSize:12, marginBottom:10 }}>YOUR PROGRESS</div>
-            <div style={{ width:320, height:8, background:'rgba(255,255,255,0.07)', borderRadius:99, overflow:'hidden', margin:'0 auto 8px' }}>
+            <div className="progress-bar-container" style={{ width:'100%', maxWidth:320, height:8, background:'rgba(255,255,255,0.07)', borderRadius:99, overflow:'hidden', margin:'0 auto 8px' }}>
               <div style={{ height:'100%', width:`${pct}%`, background:'linear-gradient(90deg, #00f5ff, #8b5cf6, #ff6b35)', borderRadius:99, boxShadow:'0 0 12px rgba(0,245,255,0.4)', transition:'width 1.2s' }} />
             </div>
             <div style={{ color:'#00f5ff', fontWeight:800, fontSize:14 }}>{completedCount}/12 Days Complete · {pct}%</div>
           </div>
         )}
         <div style={{ position:'relative' }}>
-          <div style={{ position:'absolute', left:'50%', top:20, bottom:20, width:2, background:'linear-gradient(to bottom, #00f5ff, #7c3aed, #ff6b35)', transform:'translateX(-50%)', opacity:0.25 }} />
+          <div className="roadmap-line" style={{ position:'absolute', left:'50%', top:20, bottom:20, width:2, background:'linear-gradient(to bottom, #00f5ff, #7c3aed, #ff6b35)', transform:'translateX(-50%)', opacity:0.25 }} />
           {DAYS_DATA.map((day, i) => {
             const done    = state.completedDays.includes(day.id);
             const active  = state.unlockedDays.includes(day.id) && !done;
             return (
-            <div key={day.id} style={{ display:'flex', alignItems:'flex-start', gap:20, marginBottom:20, flexDirection: i % 2 === 0 ? 'row' : 'row-reverse' }}>
-              <div style={{ flex:1, display:'flex', justifyContent: i % 2 === 0 ? 'flex-end' : 'flex-start' }}>
-                <div style={{ borderRadius:12, padding:'14px 20px', maxWidth:320,
+            <div key={day.id} className="roadmap-row" style={{ display:'flex', alignItems:'flex-start', gap:20, marginBottom:20, flexDirection: i % 2 === 0 ? 'row' : 'row-reverse' }}>
+              <div className="roadmap-content" style={{ flex:1, display:'flex', justifyContent: i % 2 === 0 ? 'flex-end' : 'flex-start' }}>
+                <div className="roadmap-card" style={{ borderRadius:12, padding:'14px 20px', maxWidth:320,
                   background: done ? `${day.color}15` : active ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.02)',
                   border:`1px solid ${done ? day.color+'55' : active ? day.color+'30' : 'rgba(255,255,255,0.07)'}`,
                   textAlign: i % 2 === 0 ? 'right' : 'left',
@@ -149,14 +149,14 @@ export default function LandingPage({ setView, setSelectedDay }) {
               }}>
                 {done ? '✓' : active ? '▶' : day.id}
               </div>
-              <div style={{ flex:1 }} />
+              <div className="roadmap-filler" style={{ flex:1 }} />
             </div>
           );})}
         </div>
       </section>
 
       {/* ── WHY GAMES ── */}
-      <section style={{ padding:'80px 24px', maxWidth:1200, margin:'0 auto' }}>
+      <section className="landing-section" style={{ padding:'80px 24px', maxWidth:1200, margin:'0 auto' }}>
         <div style={{ textAlign:'center', marginBottom:52 }}>
           <SectionLabel color="#10b981">THE SCIENCE</SectionLabel>
           <h2 style={{ fontFamily:'var(--font-head)', fontSize:'clamp(26px,4vw,42px)', color:'#fff', fontWeight:800 }}>Why Learn Through Games?</h2>
@@ -181,7 +181,7 @@ export default function LandingPage({ setView, setSelectedDay }) {
       </section>
 
       {/* ── RANK LADDER ── */}
-      <section style={{ padding:'80px 24px', maxWidth:900, margin:'0 auto' }}>
+      <section className="landing-section" style={{ padding:'80px 24px', maxWidth:900, margin:'0 auto' }}>
         <div style={{ textAlign:'center', marginBottom:52 }}>
           <SectionLabel color="#f59e0b">YOUR DESTINY</SectionLabel>
           <h2 style={{ fontFamily:'var(--font-head)', fontSize:'clamp(26px,4vw,42px)', color:'#fff', fontWeight:800 }}>Rank Up Your Skills</h2>
@@ -198,8 +198,8 @@ export default function LandingPage({ setView, setSelectedDay }) {
       </section>
 
       {/* ── FINAL CTA ── */}
-      <section style={{ padding:'80px 24px 100px', textAlign:'center' }}>
-        <div style={{ maxWidth:680, margin:'0 auto', padding:'64px 40px', borderRadius:28, background:'linear-gradient(135deg, rgba(0,245,255,0.08), rgba(124,58,237,0.1))', border:'1px solid rgba(0,245,255,0.2)', position:'relative', overflow:'hidden' }}>
+      <section className="landing-section-lg" style={{ padding:'80px 24px 100px', textAlign:'center' }}>
+        <div className="final-cta-card" style={{ maxWidth:680, margin:'0 auto', padding:'64px 40px', borderRadius:28, background:'linear-gradient(135deg, rgba(0,245,255,0.08), rgba(124,58,237,0.1))', border:'1px solid rgba(0,245,255,0.2)', position:'relative', overflow:'hidden' }}>
           <div style={{ position:'absolute', inset:0, background:'radial-gradient(ellipse at 50% 0%, rgba(0,245,255,0.1) 0%, transparent 60%)', pointerEvents:'none' }} />
           <div style={{ fontSize:56, marginBottom:20, animation:'float 3s ease-in-out infinite' }}>🏆</div>
           <h2 style={{ fontFamily:'var(--font-head)', fontSize:30, color:'#fff', fontWeight:900, marginBottom:14, position:'relative' }}>Ready to Become a Python Legend?</h2>

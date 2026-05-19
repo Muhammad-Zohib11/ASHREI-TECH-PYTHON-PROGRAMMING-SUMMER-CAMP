@@ -270,3 +270,197 @@ canvas {
   .game-btn { min-width: 44px; min-height: 44px; font-size: 16px !important; }
   canvas { border-radius: 10px !important; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   COMPREHENSIVE RESPONSIVE & MOBILE OPTIMIZATION
+   Covers: iOS Safari, Android Chrome, Samsung Internet, tablets, 4K+
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── iOS Safe Area Variables (notch / Dynamic Island support) ── */
+:root {
+  --safe-top:    env(safe-area-inset-top,    0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left:   env(safe-area-inset-left,   0px);
+  --safe-right:  env(safe-area-inset-right,  0px);
+}
+
+/* ── Fix 100vh on iOS Safari (address bar shrinks viewport) ── */
+html {
+  height: -webkit-fill-available; /* iOS Safari 10–14 */
+}
+body {
+  min-height: 100vh;
+  min-height: -webkit-fill-available; /* iOS fallback */
+  min-height: 100dvh; /* Dynamic Viewport Height — iOS 15.4+, Chrome 108+ */
+}
+
+/* ── Prevent ALL horizontal overflow ── */
+html, body { max-width: 100%; overflow-x: hidden; }
+
+/* ── Global touch performance ── */
+* { -webkit-tap-highlight-color: transparent; }
+
+/* ── Touch target minimum (WCAG 2.5.5 / iOS HIG) ── */
+button, a[role="button"], [role="button"] {
+  touch-action: manipulation; /* eliminates 300ms tap delay */
+}
+
+/* ── Hero section viewport fix ── */
+.hero-section {
+  min-height: 92vh;
+  min-height: 92svh; /* iOS Safari 15.4+ — small viewport (with address bar) */
+  min-height: 92dvh; /* dynamic viewport height */
+}
+
+/* ── Navbar safe-area padding ── */
+.navbar-inner {
+  padding-left:  max(24px, calc(16px + var(--safe-left)));
+  padding-right: max(24px, calc(16px + var(--safe-right)));
+}
+
+/* ── Responsive navbar items ── */
+@media (max-width: 640px) {
+  .xp-badge    { display: none !important; }
+  .admin-badge { display: none !important; }
+  .hide-mobile { display: none !important; }
+  .nav-label   { display: none !important; }
+}
+@media (max-width: 380px) {
+  .navbar-inner { padding: 0 12px !important; }
+}
+
+/* ── Floaters — decorative emojis — hide on small screens ── */
+@media (max-width: 640px) {
+  .floater-item { display: none !important; }
+}
+
+/* ── 12-day roadmap — single column on mobile ── */
+@media (max-width: 640px) {
+  .roadmap-row {
+    flex-direction: row !important; /* node always on left */
+    align-items: flex-start !important;
+  }
+  .roadmap-content {
+    justify-content: flex-start !important;
+    flex: 1 !important;
+  }
+  .roadmap-card {
+    text-align: left !important;
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+  .roadmap-filler { display: none !important; }
+  .roadmap-line {
+    left: 17px !important;       /* align to center of the node dot */
+    transform: none !important;
+  }
+}
+
+/* ── Hero stats row — tighter on mobile ── */
+@media (max-width: 640px) {
+  .hero-stats {
+    gap: 24px !important;
+    margin-top: 40px !important;
+  }
+  .hero-stat-value { font-size: 28px !important; }
+}
+@media (max-width: 380px) {
+  .hero-stats { gap: 16px !important; }
+  .hero-stat-value { font-size: 24px !important; }
+}
+
+/* ── LandingPage sections — tighter padding on mobile ── */
+@media (max-width: 640px) {
+  .landing-section { padding: 48px 16px !important; }
+  .landing-section-lg { padding: 48px 16px 64px !important; }
+  .final-cta-card { padding: 40px 20px !important; }
+}
+
+/* ── DayLesson improvements ── */
+@media (max-width: 640px) {
+  .mission-header { padding: 20px 16px !important; }
+  .mission-tags { gap: 8px !important; flex-wrap: wrap; }
+  .mission-rewards { gap: 12px !important; font-size: 13px !important; }
+  .progress-bar-container { width: 100% !important; max-width: 100% !important; }
+}
+
+/* ── Lessons grid — proper responsive columns ── */
+@media (max-width: 640px)  { .lessons-grid { grid-template-columns: 1fr !important; } }
+@media (min-width: 641px) and (max-width: 1023px) {
+  .lessons-grid { grid-template-columns: repeat(2, 1fr) !important; }
+}
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .lessons-grid { grid-template-columns: repeat(3, 1fr) !important; }
+}
+
+/* ── DayCard improvements on mobile ── */
+@media (max-width: 640px) {
+  .day-card { padding: 18px 16px !important; }
+}
+
+/* ── ChallengeEngine — full width on mobile ── */
+@media (max-width: 640px) {
+  .challenge-wrap { padding: 16px 12px !important; }
+  .challenge-header { padding: 16px !important; }
+  .code-snippet { font-size: 13px !important; padding: 14px 12px !important; }
+}
+
+/* ── XPBar — always full width ── */
+.xp-bar-fill { max-width: 100%; }
+
+/* ── Reward popup — mobile friendly ── */
+@media (max-width: 640px) {
+  .reward-popup-wrap { width: calc(100vw - 32px) !important; max-width: 380px; }
+}
+
+/* ── Badge page grid — responsive ── */
+@media (max-width: 640px) {
+  .badges-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 12px !important; }
+}
+@media (max-width: 380px) {
+  .badges-grid { grid-template-columns: 1fr !important; }
+}
+
+/* ── Reduce animation workload on mobile ── */
+@media (max-width: 768px) {
+  /* Slow down float animations to reduce GPU load */
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(-8px); }
+  }
+  @keyframes floatSlow {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(-4px); }
+  }
+}
+
+/* ── Tablet layout (641px – 1024px) ── */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .hero-section { padding: 60px 32px !important; }
+}
+
+/* ── Ultra-wide / 4K monitors (1920px+) ── */
+@media (min-width: 1920px) {
+  body { font-size: 17px; }
+  .navbar-inner { max-width: 1600px !important; }
+}
+
+/* ── Reduced motion — respect user preference ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration:       0.01ms !important;
+    animation-iteration-count: 1     !important;
+    transition-duration:      0.01ms !important;
+    scroll-behavior:          auto   !important;
+  }
+}
+
+/* ── iOS momentum scroll for panels ── */
+.scroll-ios {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* ── Safe bottom padding for fixed bottom bars ── */
+.pb-safe { padding-bottom: max(16px, var(--safe-bottom)); }
+.mb-safe { margin-bottom:  max(16px, var(--safe-bottom)); }

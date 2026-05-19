@@ -9,7 +9,7 @@ export default function BadgesPage() {
   const total   = BADGES_ALL.length;
 
   return (
-    <div style={{ maxWidth:1000, margin:'0 auto', padding:'40px 24px', position:'relative', zIndex:1 }} className="page-enter">
+    <div style={{ maxWidth:1000, margin:'0 auto', padding:'40px 24px 80px', position:'relative', zIndex:1 }} className="page-enter">
       <div style={{ textAlign:'center', marginBottom:44 }}>
         <SectionLabel color="#f59e0b">ACHIEVEMENTS</SectionLabel>
         <h1 style={{ fontFamily:'var(--font-head)', fontSize:34, color:'#fff', fontWeight:900 }}>Badge Collection</h1>
@@ -17,7 +17,7 @@ export default function BadgesPage() {
       </div>
 
       {/* Stats */}
-      <div style={{ borderRadius:18, padding:'22px 28px', background:'rgba(255,255,255,0.02)', border:'1px solid rgba(255,255,255,0.07)', marginBottom:36, display:'flex', gap:32, justifyContent:'center', alignItems:'center', flexWrap:'wrap' }}>
+      <div style={{ borderRadius:18, padding:'20px 20px', background:'rgba(255,255,255,0.02)', border:'1px solid rgba(255,255,255,0.07)', marginBottom:36, display:'flex', gap:24, justifyContent:'center', alignItems:'center', flexWrap:'wrap' }}>
         <div style={{ textAlign:'center' }}>
           <div style={{ color:'#f59e0b', fontFamily:'var(--font-head)', fontSize:34, fontWeight:900 }}>{earned}</div>
           <div style={{ color:'rgba(255,255,255,0.4)', fontSize:13 }}>Earned</div>
@@ -39,7 +39,7 @@ export default function BadgesPage() {
         </div>
       </div>
 
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(175px,1fr))', gap:16 }}>
+      <div className="badges-grid" style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(165px,1fr))', gap:16 }}>
         {BADGES_ALL.map((badge, i) => <GlowBadge key={i} badge={badge} />)}
       </div>
     </div>

@@ -29,8 +29,9 @@ export default function Navbar({ view, setView, setSelectedDay }) {
       background: 'rgba(8,12,24,0.92)',
       backdropFilter: 'blur(20px)',
       borderBottom: '1px solid rgba(255,107,0,0.15)',
+      paddingTop: 'env(safe-area-inset-top, 0px)',
     }}>
-      <div style={{
+      <div className="navbar-inner" style={{
         maxWidth: 1200, margin: '0 auto', padding: '0 24px',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 64,
       }}>
@@ -73,7 +74,7 @@ export default function Navbar({ view, setView, setSelectedDay }) {
         {/* ── Right: XP + avatar + switch ── */}
         <div style={{ display:'flex', alignItems:'center', gap:10 }}>
           {isAdmin && (
-            <div style={{
+            <div className="admin-badge" style={{
               background: 'rgba(255,107,0,0.12)', border: '1px solid rgba(255,107,0,0.35)',
               borderRadius: 6, padding: '3px 10px', color: 'var(--orange)', fontSize: 11, fontWeight: 700,
               letterSpacing: 1,
@@ -81,7 +82,7 @@ export default function Navbar({ view, setView, setSelectedDay }) {
               🛡️ ADMIN
             </div>
           )}
-          <div style={{
+          <div className="xp-badge" style={{
             background: 'rgba(255,107,0,0.1)', border: '1px solid rgba(255,107,0,0.25)',
             borderRadius: 6, padding: '5px 14px', color: 'var(--orange)', fontSize: 13, fontWeight: 700,
           }}>
