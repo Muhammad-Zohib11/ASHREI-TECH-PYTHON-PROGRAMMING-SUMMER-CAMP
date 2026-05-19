@@ -7,10 +7,9 @@ export default function Navbar({ view, setView, setSelectedDay }) {
   const { current } = getRankInfo(state.xp);
 
   const navItems = [
-    { id:'landing',   label:'Home',      icon:'🏠' },
-    { id:'dashboard', label:'Dashboard', icon:'📊' },
-    { id:'lessons',   label:'Lessons',   icon:'📚' },
-    { id:'badges',    label:'Badges',    icon:'🏅' },
+    { id:'landing', label:'Home',    icon:'🏠' },
+    { id:'lessons', label:'Lessons', icon:'📚' },
+    { id:'badges',  label:'Badges',  icon:'🏅' },
   ];
 
   const goTo = (id) => { setView(id); setSelectedDay(null); };
@@ -18,6 +17,7 @@ export default function Navbar({ view, setView, setSelectedDay }) {
   const switchAccount = () => {
     if (window.confirm('Switch account? This will return to the login screen.')) {
       dispatch({ type: 'RESET_ACCOUNT' });
+      window.location.replace('/hero.html');
     }
   };
 
@@ -48,7 +48,12 @@ export default function Navbar({ view, setView, setSelectedDay }) {
         {/* ── Nav items ── */}
         <div style={{ display:'flex', gap:2 }}>
           {navItems.map(item => (
-            <button key={item.id} onClick={() => goTo(item.id)} style={{
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => goTo(item.id)}
+              aria-current={view === item.id ? 'page' : undefined}
+              style={{
               padding: '7px 16px', borderRadius: 6, border: 'none', cursor: 'pointer',
               fontSize: 13, fontWeight: 600, fontFamily: 'var(--font-body)',
               background: view === item.id ? 'rgba(255,107,0,0.12)' : 'transparent',
@@ -82,8 +87,10 @@ export default function Navbar({ view, setView, setSelectedDay }) {
           }}>
             ⚡ {state.xp} XP
           </div>
-          <div
-            onClick={() => goTo('dashboard')}
+          <button
+            type="button"
+            onClick={() => goTo('lessons')}
+            aria-label={`${state.studentName} — go to lessons`}
             title={state.studentName}
             style={{
               width: 36, height: 36, borderRadius: '50%',
@@ -96,10 +103,12 @@ export default function Navbar({ view, setView, setSelectedDay }) {
             }}
           >
             {state.avatarEmoji || state.avatar}
-          </div>
+          </button>
           {/* Switch account */}
           <button
+            type="button"
             onClick={switchAccount}
+            aria-label="Switch account"
             title="Switch Account"
             style={{
               width: 34, height: 34, borderRadius: 6,
@@ -112,7 +121,7 @@ export default function Navbar({ view, setView, setSelectedDay }) {
             onMouseEnter={e => { e.currentTarget.style.borderColor='rgba(239,68,68,0.5)'; e.currentTarget.style.color='#ef4444'; }}
             onMouseLeave={e => { e.currentTarget.style.borderColor='rgba(255,255,255,0.08)'; e.currentTarget.style.color='rgba(255,255,255,0.35)'; }}
           >
-            ⏏
+            <span aria-hidden="true">⏏</span>
           </button>
         </div>
       </div>

@@ -6,7 +6,7 @@ export const DAYS_DATA_PART1 = [
     concepts: ["print()", "input()", "Variables", "Comments"],
     project: "Robot Maze", xp: 150, badge: "First Program", badgeIcon: "🚀",
     missionTag: "FIRST CONTACT",
-    story: "Welcome, Code Recruit! Today you take your first step into Python — the language that powers games, robots, and AI. You will make the computer LISTEN to you. Every legend starts with a single line of code. Are you ready to speak the language of machines?",
+    story: "Welcome, Code Recruit! 🚀 You are about to learn something INCREDIBLE. Python is the exact language used to build real video games, command flying robots, and create AI. Starting TODAY — you can make a computer do ANYTHING you say. You just need to learn its language. One line of code. That is all it takes to begin. Are you ready to speak the language of machines?",
     spaceFeature: "Game Window — your Space Shooter gets its screen today!",
     snippets: [
       {
@@ -50,7 +50,7 @@ print("Level: 1")    # Starting level`,
     concepts: ["Variables", "Strings", "Integers", "f-strings"],
     project: "Coin Collector", xp: 200, badge: "Variable Explorer", badgeIcon: "💎",
     missionTag: "DATA WIZARD",
-    story: "Every great game stores data. Player health, coins, speed, score — it is ALL variables! Without variables, games forget everything the instant it happens. You are about to become a data wizard. Name your data wisely and it will serve you forever.",
+    story: "Every great game in the world stores data. Player health, coin count, speed, score, lives — it is ALL variables! Without variables, games forget EVERYTHING the instant it happens. Think about Minecraft — your coordinates, your inventory, your health — all stored in variables. You are about to become a Data Wizard. Learn to name and store data today and you will control EVERY game you ever build.",
     spaceFeature: "Player Ship — your Space Shooter now has a controllable player variable!",
     snippets: [
       {
@@ -106,7 +106,7 @@ print(f"You are on Level {level}. Keep going!")`,
     concepts: ["Arithmetic operators", "int() / float()", "Math module", "Order of operations"],
     project: "Health Battle Simulator", xp: 220, badge: "Math Wizard", badgeIcon: "⚡",
     missionTag: "MATH MAGIC",
-    story: "Games calculate EVERYTHING. Damage dealt, distance traveled, score multipliers, enemy health. Today you teach Python to crunch numbers like a real game engine. Math is the secret power behind every game ever made. Embrace it.",
+    story: "Games calculate EVERYTHING behind the scenes. Every time an enemy hits you, Python runs a damage formula. Every time you level up, Python multiplies your XP. Every falling coin, every speed boost, every explosion — it's ALL math! Today you become the game engine. You will make Python crunch numbers like a REAL battle system.",
     spaceFeature: "Math Engine — Space Shooter calculates bullet speed and enemy damage!",
     snippets: [
       {
@@ -173,7 +173,7 @@ print(f"Final Score: {score}")`,
     concepts: ["if / elif / else", "Comparison operators", "Boolean logic", "Nested conditions"],
     project: "Rock Paper Scissors", xp: 250, badge: "Condition Commander", badgeIcon: "🧠",
     missionTag: "BRAIN POWER",
-    story: "Today we teach your game to THINK. Should the enemy attack or run? Did the player win or lose? Did health drop to zero? Conditions are the brain of every game ever made. Without if/else, programs are just calculators. With it — they become intelligent.",
+    story: "Today we teach your game to THINK. Every game decision — should the enemy attack or run? Did the player win or lose? Should the door unlock? — is an if statement! Without conditions, programs are just calculators that do the same thing every time. With conditions, they become INTELLIGENT. You are about to give your programs a brain.",
     spaceFeature: "Bullet Logic — Space Shooter fires bullets only WHEN the player presses SPACE!",
     snippets: [
       {
@@ -242,7 +242,7 @@ else:
     concepts: ["for loops", "while loops", "range()", "break / continue"],
     project: "Endless Falling Blocks", xp: 275, badge: "Loop Master", badgeIcon: "🔄",
     missionTag: "INFINITE LOOP",
-    story: "Every game runs in a LOOP. The screen redraws 60 times per second. Enemies spawn in loops. Players keep playing until they die — and that is a while loop! Today you master the engine of ALL games. Without loops, games run once and stop forever.",
+    story: "Every single game on the planet runs in a loop. Right now, Minecraft is running a loop 20 times per second. Fortnite is running a loop 60 times per second. Enemies spawn in loops. Bullets travel in loops. Score builds in loops. Today you master the ENGINE behind ALL games. After today, you will never look at a game the same way again.",
     spaceFeature: "Enemy Spawner — Space Shooter now spawns enemies in a loop every few seconds!",
     snippets: [
       {

@@ -10,7 +10,7 @@ import { validateCode, getHint } from '../utils/codeValidator.js';
  *   stepIndex   - 0-based index
  *   totalSteps  - total steps count
  */
-export default function CodeChallengeCard({ step, dayColor, onSuccess, stepIndex, totalSteps }) {
+export default function CodeChallengeCard({ step, dayColor, onSuccess, stepIndex, totalSteps, isAdmin }) {
   const [userCode, setUserCode]     = useState('');
   const [result, setResult]         = useState(null);   // {valid, feedback}
   const [attempts, setAttempts]     = useState(0);
@@ -211,6 +211,20 @@ export default function CodeChallengeCard({ step, dayColor, onSuccess, stepIndex
             >
               ▶ Run & Validate Code
             </button>
+            {isAdmin && (
+              <button
+                type="button"
+                onClick={() => { setShowSuccess(true); setTimeout(() => onSuccess(step.xp), 400); }}
+                style={{
+                  width: '100%', marginTop: 8, padding: '10px 0', borderRadius: 10,
+                  border: '1px solid rgba(255,107,0,0.4)', background: 'rgba(255,107,0,0.08)',
+                  color: 'var(--orange)', fontWeight: 800, fontSize: 12, cursor: 'pointer',
+                  fontFamily: 'inherit', letterSpacing: 0.5,
+                }}
+              >
+                🛡️ Admin Skip
+              </button>
+            )}
           </>
         ) : (
           // Success state

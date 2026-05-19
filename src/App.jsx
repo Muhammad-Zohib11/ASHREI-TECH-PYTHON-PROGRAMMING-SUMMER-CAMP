@@ -1,9 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ProgressProvider, useProgress } from './context/ProgressContext.jsx';
 import MainLayout  from './layouts/MainLayout.jsx';
-import Onboarding  from './pages/Onboarding.jsx';
 import LandingPage from './pages/LandingPage.jsx';
-import Dashboard   from './pages/Dashboard.jsx';
 import LessonsGrid from './pages/LessonsGrid.jsx';
 import DayLesson   from './pages/DayLesson.jsx';
 import BadgesPage  from './pages/BadgesPage.jsx';
@@ -11,18 +9,21 @@ import BadgesPage  from './pages/BadgesPage.jsx';
 // Inner app — reads onboardingDone from context
 function AppInner() {
   const { state } = useProgress();
-  const [view, setView]               = useState('landing');
+  const [view, setView]               = useState('lessons');
   const [selectedDay, setSelectedDay] = useState(null);
 
-  // First-time users → onboarding (no nav shell needed)
+  // Scroll to top on every view change or day change
+  useEffect(() => { window.scrollTo(0, 0); }, [view, selectedDay]);
+
+  // Not onboarded → go to the 3D landing page
   if (!state.onboardingDone) {
-    return <Onboarding />;
+    window.location.replace('/hero.html');
+    return null;
   }
 
   return (
     <MainLayout view={view} setView={setView} setSelectedDay={setSelectedDay}>
       {view === 'landing'   && <LandingPage setView={setView} setSelectedDay={setSelectedDay} />}
-      {view === 'dashboard' && <Dashboard   setView={setView} setSelectedDay={setSelectedDay} />}
       {view === 'lessons'   && <LessonsGrid setView={setView} setSelectedDay={setSelectedDay} />}
       {view === 'day'       && selectedDay && (
         <DayLesson day={selectedDay} setView={setView} setSelectedDay={setSelectedDay} />

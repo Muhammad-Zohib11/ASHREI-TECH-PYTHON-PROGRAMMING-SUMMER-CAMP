@@ -4,6 +4,7 @@ import { CHALLENGES_DATA } from '../data/challenges.js';
 import { BADGES_ALL } from '../data/badges.js';
 import { DAYS_DATA } from '../data/lessons.js';
 import CodeChallengeCard from './CodeChallengeCard.jsx';
+import FillBlankCode from './FillBlankCode.jsx';
 import LockedContentCard from './LockedContentCard.jsx';
 import XPRewardPopup from './XPRewardPopup.jsx';
 import MiniGame from './MiniGame.jsx';
@@ -21,13 +22,18 @@ export default function ChallengeEngine({ day, dayColor, setView, setSelectedDay
   const totalSteps = steps.length;
 
   const isAdmin = state.gamerTag === 'admin123';
-  const allStepIds = steps.map(s => s.id);
 
-  const [completedSteps, setCompletedSteps] = useState(isAdmin ? allStepIds : []);
+  const [completedSteps, setCompletedSteps] = useState([]);
   const [xpPopup,        setXpPopup]        = useState(null);
   const [showComplete,   setShowComplete]   = useState(false);
-  // Admin: never fire the day-complete overlay automatically
-  const [alreadyFired,   setAlreadyFired]   = useState(isAdmin);
+  // Already completed this day? Don't re-fire the overlay
+  const [alreadyFired,   setAlreadyFired]   = useState(
+    () => !!(state.completedChallenges?.includes(day.id))
+  );
+
+  const warmupSteps    = steps.filter(s => s.type !== 'fill-blank');
+  const detectiveSteps = steps.filter(s => s.type === 'fill-blank');
+  const warmupDone     = warmupSteps.length === 0 || warmupSteps.every(s => completedSteps.includes(s.id));
 
   const completedCount = completedSteps.length;
   const allDone        = completedCount >= totalSteps;
@@ -41,7 +47,7 @@ export default function ChallengeEngine({ day, dayColor, setView, setSelectedDay
 
   // Fire COMPLETE_CHALLENGE once when all steps done
   useEffect(() => {
-    if (allDone && !alreadyFired && !state.completedDays?.includes(day.id)) {
+    if (allDone && !alreadyFired && !state.completedChallenges?.includes(day.id)) {
       setAlreadyFired(true);
       dispatch({
         type: 'COMPLETE_CHALLENGE',
@@ -52,7 +58,10 @@ export default function ChallengeEngine({ day, dayColor, setView, setSelectedDay
         },
       });
       // Short delay then show celebration overlay
-      setTimeout(() => setShowComplete(true), 1200);
+      setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        setShowComplete(true);
+      }, 1200);
     }
   }, [allDone]);
 
@@ -71,11 +80,12 @@ export default function ChallengeEngine({ day, dayColor, setView, setSelectedDay
     }
   };
 
-  // Any key closes overlay and navigates
+  // Enter or Escape closes overlay — NOT Space (Space is used by game controls)
   useEffect(() => {
     if (!showComplete) return;
     const handle = (e) => {
-      if (e.type === 'keydown' || e.type === 'click') goNextDay();
+      if (e.type === 'keydown' && e.key !== 'Enter' && e.key !== 'Escape') return;
+      goNextDay();
     };
     window.addEventListener('keydown', handle);
     return () => window.removeEventListener('keydown', handle);
@@ -122,20 +132,25 @@ export default function ChallengeEngine({ day, dayColor, setView, setSelectedDay
         }} />
       </div>
 
-      {/* Hint bar */}
+      {/* Phase hint bar */}
       <div style={{
         padding: '12px 18px', borderRadius: 12, marginBottom: 20,
-        background: `${dayColor}10`, border: `1px solid ${dayColor}25`,
-        color: 'rgba(255,255,255,0.65)', fontSize: 13, lineHeight: 1.6,
+        background: warmupDone ? 'rgba(139,92,246,0.1)' : `${dayColor}10`,
+        border: `1px solid ${warmupDone ? 'rgba(139,92,246,0.35)' : `${dayColor}25`}`,
+        color: 'rgba(255,255,255,0.7)', fontSize: 13, lineHeight: 1.6,
+        transition: 'all 0.4s ease',
       }}>
-        🎯 Complete all {totalSteps} missions to unlock the live game below!
-        &nbsp;Tab = 4 spaces · Ctrl+Enter = validate
+        {!warmupDone
+          ? <>🎯 Complete the warmup missions below to unlock the game &amp; Code Detective Mode!</>
+          : !allDone
+            ? <>🔍 Game unlocked! Play it — feel how it works — then <strong style={{color:'#a78bfa'}}>crack the code</strong> in Detective Mode below!</>
+            : <>✅ Day complete! You played the game AND decoded the real code that powers it!</>}
       </div>
 
-      {/* Challenge steps — each locked until previous complete */}
+      {/* ── PHASE 1: Warmup Missions ── */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-        {steps.map((step, idx) => {
-          const prevDone = idx === 0 || completedSteps.includes(steps[idx - 1].id);
+        {warmupSteps.map((step, idx) => {
+          const prevDone = idx === 0 || completedSteps.includes(warmupSteps[idx - 1].id);
           return (
             <LockedContentCard
               key={step.id}
@@ -148,6 +163,7 @@ export default function ChallengeEngine({ day, dayColor, setView, setSelectedDay
                 dayColor={dayColor}
                 stepIndex={idx}
                 totalSteps={totalSteps}
+                isAdmin={isAdmin}
                 onSuccess={(xp) => handleStepSuccess(step.id, xp)}
               />
             </LockedContentCard>
@@ -155,16 +171,64 @@ export default function ChallengeEngine({ day, dayColor, setView, setSelectedDay
         })}
       </div>
 
-      {/* Game unlock section — locked until all missions complete */}
+      {/* ── PHASE 2: Live Game — unlocks after warmup ── */}
       <div style={{ marginTop: 24 }}>
         <LockedContentCard
-          unlocked={allDone}
+          unlocked={warmupDone}
           dayColor={dayColor}
-          label="Complete all code missions above to play the live game!"
+          label="Complete the warmup missions above to unlock the game!"
         >
           <GameUnlockPanel miniGame={miniGame} dayColor={dayColor} dayId={day.id} />
         </LockedContentCard>
       </div>
+
+      {/* ── PHASE 3: Code Detective Mode — unlocks after warmup ── */}
+      {detectiveSteps.length > 0 && (
+        <div style={{ marginTop: 24 }}>
+          <LockedContentCard
+            unlocked={warmupDone}
+            dayColor={dayColor}
+            label="Play the game above first — then crack the code!"
+          >
+            {/* Detective header banner */}
+            <div style={{
+              padding: '18px 22px',
+              background: 'linear-gradient(135deg, rgba(139,92,246,0.18), rgba(59,130,246,0.12))',
+              borderBottom: '1px solid rgba(139,92,246,0.3)',
+              borderRadius: '18px 18px 0 0',
+              display: 'flex', alignItems: 'center', gap: 14,
+            }}>
+              <div style={{
+                width: 44, height: 44, borderRadius: 12, flexShrink: 0,
+                background: 'rgba(139,92,246,0.2)', border: '1px solid rgba(139,92,246,0.4)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22,
+              }}>🔍</div>
+              <div>
+                <div style={{ color: '#a78bfa', fontWeight: 900, fontSize: 13, letterSpacing: 3, marginBottom: 3 }}>
+                  CODE DETECTIVE MODE
+                </div>
+                <div style={{ color: 'rgba(255,255,255,0.55)', fontSize: 12, lineHeight: 1.5 }}>
+                  You just played <strong style={{color:'rgba(255,255,255,0.85)'}}>{miniGame.title}</strong>.
+                  Now inspect the <em>real code</em> that powers it — and fill in the missing pieces.
+                </div>
+              </div>
+            </div>
+            {/* Detective steps */}
+            {detectiveSteps.map((step, idx) => (
+              <FillBlankCode
+                key={step.id}
+                step={step}
+                dayColor={'#a78bfa'}
+                stepIndex={warmupSteps.length + idx}
+                totalSteps={totalSteps}
+                gameName={miniGame.title}
+                isAdmin={isAdmin}
+                onSuccess={(xp) => handleStepSuccess(step.id, xp)}
+              />
+            ))}
+          </LockedContentCard>
+        </div>
+      )}
     </div>
   );
 }
@@ -178,7 +242,8 @@ function DayCompleteOverlay({ day, dayColor, badge, hasNextDay, nextDayId, onCon
         position: 'fixed', inset: 0, zIndex: 1000,
         background: 'rgba(4,8,15,0.92)',
         backdropFilter: 'blur(12px)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        display: 'flex', alignItems: 'flex-start', justifyContent: 'center',
+        paddingTop: '5vh', paddingLeft: 16, paddingRight: 16, overflowY: 'auto',
         animation: 'fadeIn 0.4s ease',
         cursor: 'pointer',
       }}
@@ -186,7 +251,7 @@ function DayCompleteOverlay({ day, dayColor, badge, hasNextDay, nextDayId, onCon
       <div
         onClick={e => e.stopPropagation()}
         style={{
-          width: '100%', maxWidth: 480, margin: '0 24px',
+          width: '100%', maxWidth: 480,
           borderRadius: 24, overflow: 'hidden',
           border: `1px solid ${dayColor}50`,
           background: `linear-gradient(145deg, rgba(4,8,15,0.98), rgba(10,20,40,0.98))`,
@@ -296,11 +361,11 @@ function GameUnlockPanel({ miniGame, dayColor, dayId }) {
         borderBottom: `1px solid ${dayColor}35`,
         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
       }}>
-        <span style={{ fontSize: 18 }}>🏆</span>
+        <span style={{ fontSize: 18 }}>�</span>
         <span style={{ color: dayColor, fontSize: 12, fontWeight: 900, letterSpacing: 2 }}>
-          ALL MISSIONS COMPLETE — GAME UNLOCKED!
+          GAME UNLOCKED — PLAY IT, THEN DECODE THE CODE BELOW!
         </span>
-        <span style={{ fontSize: 18 }}>🎮</span>
+        <span style={{ fontSize: 18 }}>🔍</span>
       </div>
 
       {/* Game info strip */}

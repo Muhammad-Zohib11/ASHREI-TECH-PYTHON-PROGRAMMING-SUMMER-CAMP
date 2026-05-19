@@ -169,20 +169,20 @@ export default function DayLesson({ day, setView, setSelectedDay }) {
 
   const [popup, setPopup] = useState(null); // 'xp' | 'badge' | null
 
+  const prevDay = day.id > 1  ? DAYS_DATA[day.id - 2] : null;
+  const nextDay = day.id < 12 ? DAYS_DATA[day.id]     : null;
+
   const handleComplete = () => {
     if (challengeDone) return;
     dispatch({ type:'COMPLETE_CHALLENGE', payload:{ dayId: day.id, xpReward: day.xp, badgeName: day.badge } });
-    window.scrollTo({ top: 0, behavior: 'smooth' });
     setPopup('xp');
   };
 
   const handlePopupClose = () => {
     if (popup === 'xp') { setPopup('badge'); return; }
     setPopup(null);
+    if (nextDay) setSelectedDay(nextDay);
   };
-
-  const prevDay = day.id > 1  ? DAYS_DATA[day.id - 2] : null;
-  const nextDay = day.id < 12 ? DAYS_DATA[day.id]     : null;
   const nextUnlocked = nextDay && state.unlockedDays.includes(nextDay.id);
 
   return (
@@ -245,7 +245,7 @@ export default function DayLesson({ day, setView, setSelectedDay }) {
       </div>
 
       {/* Reward popups */}
-      {popup && <RewardPopup type={popup} day={day} onClose={handlePopupClose} />}
+      {popup && <RewardPopup type={popup} day={day} nextDay={nextDay} onClose={handlePopupClose} />}
     </div>
   );
 }

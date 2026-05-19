@@ -1,4 +1,5 @@
 import SectionLabel from '../components/SectionLabel.jsx';
+import HeroSplineBackground from '../components/HeroSplineBackground.jsx';
 import { GAMES_SHOWCASE } from '../data/showcase.js';
 import { RANKS } from '../data/ranks.js';
 import { DAYS_DATA } from '../data/lessons.js';
@@ -23,7 +24,14 @@ export default function LandingPage({ setView, setSelectedDay }) {
     <div style={{ position:'relative', zIndex:1 }} className="page-enter">
 
       {/* ── HERO ── */}
-      <section style={{ minHeight:'92vh', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', padding:'80px 24px', textAlign:'center', position:'relative' }}>
+      <section style={{ minHeight:'92vh', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', padding:'80px 24px', textAlign:'center', position:'relative', overflow:'hidden' }}>
+
+        {/* 3D Spline background — sits behind all content */}
+        <HeroSplineBackground />
+
+        {/* All hero content — sits above Spline via natural stacking */}
+        <div style={{ position:'relative', zIndex:1, width:'100%', display:'flex', flexDirection:'column', alignItems:'center' }}>
+
         {FLOATERS.map((f, i) => (
           <div key={i} style={{ position:'absolute', left:f.x, top:f.y, fontSize:f.s, animation:`float 4s ease-in-out ${f.d} infinite`, pointerEvents:'none', userSelect:'none', opacity:0.65 }}>{f.e}</div>
         ))}
@@ -46,7 +54,7 @@ export default function LandingPage({ setView, setSelectedDay }) {
         </p>
 
         <div style={{ display:'flex', gap:16, flexWrap:'wrap', justifyContent:'center' }}>
-          <button onClick={() => setView('dashboard')} style={{ padding:'16px 44px', borderRadius:12, border:'none', cursor:'pointer', background:'linear-gradient(135deg, #00f5ff, #7c3aed)', color:'#000', fontWeight:900, fontSize:16, fontFamily:'inherit', boxShadow:'0 0 40px rgba(0,245,255,0.35)', animation:'heroglowbtn 2s ease-in-out infinite', letterSpacing:0.5 }}>
+          <button onClick={() => setView('lessons')} style={{ padding:'16px 44px', borderRadius:12, border:'none', cursor:'pointer', background:'linear-gradient(135deg, #00f5ff, #7c3aed)', color:'#000', fontWeight:900, fontSize:16, fontFamily:'inherit', boxShadow:'0 0 40px rgba(0,245,255,0.35)', animation:'heroglowbtn 2s ease-in-out infinite', letterSpacing:0.5 }}>
             🚀 Start Journey
           </button>
           <button onClick={() => setView('lessons')} style={{ padding:'16px 44px', borderRadius:12, cursor:'pointer', background:'rgba(255,255,255,0.05)', color:'rgba(255,255,255,0.85)', fontWeight:700, fontSize:16, fontFamily:'inherit', border:'1px solid rgba(255,255,255,0.18)', letterSpacing:0.5 }}>
@@ -63,6 +71,8 @@ export default function LandingPage({ setView, setSelectedDay }) {
             </div>
           ))}
         </div>
+
+        </div>{/* end z-index:1 content wrapper */}
       </section>
 
       {/* ── GAME SHOWCASE ── */}
@@ -194,7 +204,7 @@ export default function LandingPage({ setView, setSelectedDay }) {
           <div style={{ fontSize:56, marginBottom:20, animation:'float 3s ease-in-out infinite' }}>🏆</div>
           <h2 style={{ fontFamily:'var(--font-head)', fontSize:30, color:'#fff', fontWeight:900, marginBottom:14, position:'relative' }}>Ready to Become a Python Legend?</h2>
           <p style={{ color:'rgba(255,255,255,0.55)', marginBottom:36, fontSize:16, lineHeight:1.6, position:'relative' }}>Join the 12-day adventure. Build games you'll be proud to show.</p>
-          <button onClick={() => setView('dashboard')} style={{ padding:'18px 56px', borderRadius:14, border:'none', cursor:'pointer', background:'linear-gradient(135deg, #00f5ff, #7c3aed)', color:'#000', fontWeight:900, fontSize:18, fontFamily:'inherit', boxShadow:'0 0 50px rgba(0,245,255,0.4)', position:'relative' }}>
+          <button onClick={() => setView('lessons')} style={{ padding:'18px 56px', borderRadius:14, border:'none', cursor:'pointer', background:'linear-gradient(135deg, #00f5ff, #7c3aed)', color:'#000', fontWeight:900, fontSize:18, fontFamily:'inherit', boxShadow:'0 0 50px rgba(0,245,255,0.4)', position:'relative' }}>
             🚀 Begin Your Quest
           </button>
         </div>

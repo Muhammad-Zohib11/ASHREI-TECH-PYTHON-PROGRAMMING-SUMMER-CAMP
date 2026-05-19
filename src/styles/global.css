@@ -34,12 +34,6 @@ html { scroll-behavior: smooth; }
   --muted:         #7880A0;
   --white:         #FFFFFF;
 
-  /* Legacy aliases kept for compat */
-  --cyan:          #00D68F;
-  --green:         #00D68F;
-  --amber:         #f59e0b;
-  --pink:          #ec4899;
-
   /* Fonts */
   --font-head: 'Bebas Neue', 'Orbitron', sans-serif;
   --font-body: 'DM Sans', 'Exo 2', 'Segoe UI', sans-serif;
@@ -149,8 +143,11 @@ button:active { transform: scale(0.97); }
   to   { opacity: 1; }
 }
 @keyframes confettiFall {
-  0%   { transform: translateY(-20px) rotate(0deg);   opacity: 1; }
-  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+  0%   { transform: translateY(-20px)  translateX(0px)   rotate(0deg);   opacity: 1; }
+  25%  { transform: translateY(22vh)   translateX(18px)  rotate(180deg); opacity: 1; }
+  55%  { transform: translateY(58vh)   translateX(-14px) rotate(440deg); opacity: 0.9; }
+  80%  { transform: translateY(82vh)   translateX(22px)  rotate(600deg); opacity: 0.5; }
+  100% { transform: translateY(105vh)  translateX(6px)   rotate(720deg); opacity: 0; }
 }
 @keyframes challengeShake {
   10%, 90% { transform: translateX(-2px); }
@@ -174,6 +171,16 @@ button:active { transform: scale(0.97); }
   from { width: 0; }
   to   { width: 100%; }
 }
+@keyframes heroglowbtn {
+  0%, 100% { box-shadow: 0 0 25px rgba(0,245,255,0.35); }
+  50%       { box-shadow: 0 0 55px rgba(0,245,255,0.7); }
+}
+@keyframes splineSpinRing    { to { transform: rotate(360deg); } }
+@keyframes welcomeBounce     { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+@keyframes pulseGreen        { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+@keyframes comingSoonPulse   { 0%,100% { opacity:0.6; } 50% { opacity:1; } }
+@keyframes initFadeIn        { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+@keyframes initSpinCheck     { to { transform: rotate(360deg); } }
 
 /* ── Utility classes ── */
 .bebas     { font-family: var(--font-head); }
@@ -209,9 +216,57 @@ button:active { transform: scale(0.97); }
   .hide-mobile { display: none !important; }
   .nav-label   { display: none; }
   .lessons-grid { grid-template-columns: 1fr !important; }
-  .dashboard-grid { grid-template-columns: 1fr !important; }
   .day-lesson-wrap { padding: 24px 16px !important; }
 }
 @media (min-width: 769px) {
   .hide-desktop { display: none !important; }
+}
+
+/* ── Canvas — responsive + touch ── */
+canvas {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  touch-action: none;   /* prevents page scroll while interacting with canvas */
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ── Game control buttons — touch-friendly ── */
+.game-controls {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  touch-action: manipulation; /* fast tap, no scroll */
+  -webkit-user-select: none;
+  user-select: none;
+}
+.game-btn {
+  min-width: 48px;
+  min-height: 48px;       /* thumb-friendly touch target */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* ── Terminal input — prevent iOS auto-zoom ── */
+.terminal-input {
+  font-size: 16px !important;  /* 16px prevents iOS zoom on focus */
+}
+
+/* ── Reward popup — full screen safe ── */
+.reward-popup-wrap {
+  padding: 28px 20px;
+}
+
+/* ── Mobile game layout ── */
+@media (max-width: 480px) {
+  .day-lesson-wrap { padding: 16px 12px !important; }
+  .game-controls { gap: 6px; }
+  .game-btn { min-width: 44px; min-height: 44px; font-size: 16px !important; }
+  canvas { border-radius: 10px !important; }
 }

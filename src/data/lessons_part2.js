@@ -6,7 +6,7 @@ export const DAYS_DATA_PART2 = [
     concepts: ["def keyword", "Parameters", "Return values", "Default arguments"],
     project: "Reaction Speed Game", xp: 300, badge: "Function Wizard", badgeIcon: "🧙",
     missionTag: "SUPERPOWER FORGE",
-    story: "Functions are your reusable superpowers. Define once, call everywhere. Want to calculate damage? Call calculate_damage(). Spawn an enemy? Call spawn_enemy(). Professional developers THINK in functions. Today you stop writing scripts and start writing real programs.",
+    story: "You have been writing scripts. Today, you write PROGRAMS. What is the difference? A program is ORGANIZED. Functions are your reusable superpowers — write a piece of code once, give it a name, and call it 1000 times without typing it again. Every game, every app, every AI model ever built is made of functions calling other functions. This is how professionals code. Starting today — this is how YOU code.",
     spaceFeature: "Power-Ups — Space Shooter now has a use_powerup() function that applies effects!",
     snippets: [
       {
@@ -82,7 +82,7 @@ print(f"Reaction: {reaction_ms}ms — {rating}")`,
     concepts: ["List creation", "Indexing", "append() / remove()", "Looping through lists"],
     project: "Snake Lite", xp: 325, badge: "Array Warrior", badgeIcon: "🐍",
     missionTag: "DATA ARMY",
-    story: "A Snake game IS a list of positions. High scores ARE a list. Enemy waves ARE a list. Power-ups ARE a list. Lists are the backbone of every game ever made. Today you command armies of data. With lists, your programs go from single soldiers to full battalions.",
+    story: "The Snake game's body is LITERALLY a Python list. Every time the snake moves, the list updates. Bullet systems, enemy wave lists, high score boards, card decks, inventory slots — it's ALL lists! Today you command ARMIES of data. One list can hold hundreds of values, sort them instantly, and let you find anything in milliseconds. This is the data structure behind almost every program ever written.",
     spaceFeature: "Wave System — Space Shooter tracks all active enemies in a list and removes them when hit!",
     snippets: [
       {
@@ -158,7 +158,7 @@ print(f"\nRemaining: {enemies}")`,
     concepts: ["random module", "randint()", "choice()", "shuffle()", "seed()"],
     project: "Meteor Dodge", xp: 350, badge: "Randomness Ninja", badgeIcon: "🎲",
     missionTag: "CHAOS MASTER",
-    story: "What makes games ADDICTIVE? SURPRISE! Random meteor positions, random item drops, random enemy behaviour, random loot. Today you add the element of chaos that keeps players hooked forever. Random is the secret ingredient of every great game.",
+    story: "What makes games ADDICTIVE? SURPRISE! Remove randomness from Minecraft and every world looks the same. Remove it from Fortnite and every match is identical. Remove it from any card game and there's no point playing twice. Today you crack open import random — the module that creates INFINITE replayability. Random meteor positions. Random loot. Random enemy spawns. Random card shuffles. After today, no two runs of your games will ever be the same.",
     spaceFeature: "Random Meteors — Space Shooter now spawns meteors at random positions with random speeds!",
     snippets: [
       {
@@ -284,7 +284,7 @@ print(f"Player 2: {' '.join(player2_hand)}")`,
     concepts: ["Bird physics", "Gravity & velocity", "Pipe collision", "Score system", "Game-over screen"],
     project: "Flappy Bird", xp: 500, badge: "Flappy Legend", badgeIcon: "🐦",
     missionTag: "FLAPPY LEGEND",
-    story: "THE DAY HAS COME. You have the skills. Variables, conditions, loops, functions, lists, randomness — all of it led to THIS. Today we build Flappy Bird from scratch using Pygame. This is not a tutorial. This is a game launch. You ARE a game developer.",
+    story: "Gravity. Momentum. Collision. These are physics — and you are about to code them from scratch. Flappy Bird sold 50 million downloads. It was built by ONE developer in two days. Today, you join that club.",
     spaceFeature: "Score System + Game Over — Space Shooter now has a full score display and game over screen!",
     snippets: [
       {

@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Python Programming by Muhammad Zohib</title>
+
+  <!-- Tabler Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+
+  <!-- Spline 3D viewer (no auth required) -->
+  <script type="module" src="https://unpkg.com/@splinetool/viewer@1.9.82/build/spline-viewer.js"></script>
+
+  <!-- Global styles (existing — not written here) -->
+  <link rel="stylesheet" href="styles.css" />
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600;900&family=Inter:wght@400;500;600&display=swap');
+
+    /* ── CSS Variables ─────────────────────────────────────── */
+    :root {
+      --sp-orange:   #ff6b1a;
+      --sp-teal:     #00c896;
+      --sp-white-4:  rgba(255,255,255,0.04);
+      --sp-white-10: rgba(255,255,255,0.10);
+      --sp-white-25: rgba(255,255,255,0.25);
+    }
+
+    /* ── Base ──────────────────────────────────────────────── */
+    body {
+      background: #07080f;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ── Grid overlay ─────────────────────────────────────── */
+    .sp-grid {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(0,200,150,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,200,150,0.025) 1px, transparent 1px);
+      background-size: 44px 44px;
+    }
+
+    /* ── Scan line ─────────────────────────────────────────── */
+    .sp-scanline {
+      position: fixed;
+      left: 0; right: 0;
+      height: 1px;
+      z-index: 2;
+      pointer-events: none;
+      background: rgba(0,220,160,0.06);
+      animation: sp-scan 7s linear infinite;
+    }
+    @keyframes sp-scan {
+      0%   { top: 0%; }
+      100% { top: 100%; }
+    }
+
+    /* ── Vignette ──────────────────────────────────────────── */
+    .sp-vignette {
+      position: fixed;
+      inset: 0;
+      z-index: 3;
+      pointer-events: none;
+      background: radial-gradient(ellipse 80% 80% at 50% 50%, transparent 35%, rgba(0,0,0,0.6) 100%);
+    }
+
+    /* ── Ambient glow ──────────────────────────────────────── */
+    .sp-ambient {
+      position: fixed;
+      inset: 0;
+      z-index: 4;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse 50% 40% at 50% 52%, rgba(255,107,26,0.055) 0%, transparent 70%),
+        radial-gradient(ellipse 35% 55% at 58% 42%, rgba(0,200,150,0.04)  0%, transparent 65%);
+    }
+
+    /* ── Mannequin container (z-10) ────────────────────────── */
+    .sp-mannequin-wrap {
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      pointer-events: none;
+    }
+    .sp-mannequin-wrap spline-viewer,
+    .sp-mannequin-wrap iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      pointer-events: auto;
+    }
+
+    /* ── Badge cover (hides "Built with Spline" button) ─────── */
+    .sp-badge-cover {
+      position: fixed;
+      bottom: 5px;
+      right: 5px;
+      width: 195px;
+      height: 62px;
+      background: #07080f;
+      border-radius: 40px;
+      z-index: 25;
+      pointer-events: none;
+    }
+
+    /* ── Navbar ────────────────────────────────────────────── */
+    .sp-navbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 1.25rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      animation: sp-fade-down 0.6s ease both;
+    }
+    .sp-wordmark {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: white;
+      letter-spacing: 0.08em;
+      user-select: none;
+    }
+    .sp-nav-pills {
+      display: flex;
+      gap: 10px;
+    }
+    .sp-pill {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 999px;
+      padding: 8px 18px;
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .sp-pill:hover { background: rgba(255,255,255,0.12); }
+    .sp-pill-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .sp-pill-dot--orange { background: var(--sp-orange); box-shadow: 0 0 6px var(--sp-orange); }
+    .sp-pill-dot--blue   { background: #4488ff;         box-shadow: 0 0 6px #4488ff; }
+
+    /* ── Title block ───────────────────────────────────────── */
+    .sp-title-block {
+      position: fixed;
+      left: 2.5rem;
+      bottom: 35%;
+      z-index: 10;
+      animation: sp-fade-up 0.8s 0.3s ease both;
+    }
+    .sp-hero-title {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 900;
+      font-size: clamp(48px, 6vw, 78px);
+      color: white;
+      letter-spacing: 0.04em;
+      margin: 0;
+      line-height: 1;
+      animation: sp-breathe 4s ease-in-out infinite;
+    }
+    @keyframes sp-breathe {
+      0%, 100% { letter-spacing: 0.04em; }
+      50%       { letter-spacing: 0.08em; }
+    }
+    .sp-hero-sub {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 600;
+      font-size: 15px;
+      color: rgba(255,255,255,0.45);
+      letter-spacing: 0.32em;
+      margin: 6px 0 10px;
+    }
+    .sp-hero-author {
+      font-family: 'Inter', sans-serif;
+      font-weight: 400;
+      font-size: 11px;
+      color: var(--sp-orange);
+      letter-spacing: 0.22em;
+      margin: 0;
+    }
+
+    /* ── Sidebar ───────────────────────────────────────────── */
+    .sp-sidebar {
+      position: fixed;
+      left: 1.25rem;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 30;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .sp-icon-btn {
+      width: 38px; height: 38px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: rgba(255,255,255,0.4);
+      font-size: 18px;
+      transition: all 0.2s;
+      position: relative;
+      opacity: 0;
+      animation: sp-fade-up 0.5s ease forwards;
+    }
+    .sp-icon-btn:nth-child(1) { animation-delay: 0.5s; }
+    .sp-icon-btn:nth-child(2) { animation-delay: 0.65s; }
+    .sp-icon-btn:nth-child(3) { animation-delay: 0.8s; }
+    .sp-icon-btn:nth-child(4) { animation-delay: 0.95s; }
+    .sp-icon-btn:nth-child(5) { animation-delay: 1.1s; }
+    .sp-icon-btn:hover {
+      background: rgba(255,255,255,0.10);
+      color: rgba(255,255,255,0.8);
+    }
+    .sp-icon-btn.sp-active {
+      background: rgba(255,107,26,0.15);
+      border-color: rgba(255,107,26,0.5);
+      color: var(--sp-orange);
+    }
+    .sp-icon-btn.sp-active::after {
+      content: '';
+      position: absolute;
+      inset: -3px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,107,26,0.4);
+      animation: sp-ring 2s ease-out infinite;
+      pointer-events: none;
+    }
+    @keyframes sp-ring {
+      0%   { opacity: 1; transform: scale(1); }
+      100% { opacity: 0; transform: scale(1.45); }
+    }
+
+    /* ── Glass card ────────────────────────────────────────── */
+    .sp-glass-card {
+      position: fixed;
+      right: 2rem;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 20;
+      width: 300px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 20px;
+      padding: 2rem 1.75rem;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      animation: sp-fade-left 0.8s 0.2s ease both;
+    }
+    /* Top shimmer glow */
+    .sp-glass-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 2rem; right: 2rem;
+      height: 1px;
+      background: linear-gradient(90deg, transparent 0%, var(--sp-orange) 50%, transparent 100%);
+      background-size: 200% auto;
+      animation: sp-shimmer 3s linear infinite;
+      border-radius: 0;
+    }
+    @keyframes sp-shimmer {
+      0%   { background-position: -200% center; }
+      100% { background-position:  200% center; }
+    }
+    /* Bottom-right corner bracket */
+    .sp-glass-card::after {
+      content: '';
+      position: absolute;
+      bottom: 1rem; right: 1rem;
+      width: 12px; height: 12px;
+      border-bottom: 2px solid var(--sp-orange);
+      border-right:  2px solid var(--sp-orange);
+    }
+    /* Top-left corner bracket */
+    .sp-bracket-tl {
+      position: absolute;
+      top: 1rem; left: 1rem;
+      width: 12px; height: 12px;
+      border-top:  2px solid var(--sp-orange);
+      border-left: 2px solid var(--sp-orange);
+    }
+
+    /* Card content */
+    .sp-card-rocket {
+      text-align: center;
+      font-size: 28px;
+      margin-bottom: 8px;
+      animation: sp-bounce-soft 3s ease-in-out infinite;
+    }
+    @keyframes sp-bounce-soft {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-5px); }
+    }
+    .sp-card-welcome {
+      font-family: 'Inter', sans-serif;
+      font-weight: 500;
+      font-size: 10px;
+      color: rgba(255,255,255,0.35);
+      letter-spacing: 0.2em;
+      text-align: center;
+      margin: 0;
+    }
+    .sp-card-brand {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 700;
+      font-size: 22px;
+      color: var(--sp-orange);
+      letter-spacing: 0.06em;
+      text-align: center;
+      margin: 4px 0;
+    }
+    .sp-card-academy {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 600;
+      font-size: 15px;
+      color: white;
+      letter-spacing: 0.18em;
+      text-align: center;
+      margin: 0;
+    }
+    .sp-card-tagline {
+      font-family: 'Inter', sans-serif;
+      font-weight: 400;
+      font-size: 12px;
+      color: rgba(255,255,255,0.28);
+      text-align: center;
+      line-height: 1.6;
+      margin: 10px 0 18px;
+    }
+    .sp-feature-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 14px;
+      margin-bottom: 8px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 10px;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      color: rgba(255,255,255,0.75);
+      transition: background 0.2s, border-color 0.2s;
+      cursor: default;
+    }
+    .sp-feature-row:hover {
+      background: rgba(255,255,255,0.09);
+      border-color: rgba(255,107,26,0.22);
+    }
+    .sp-cta {
+      width: 100%;
+      background: var(--sp-orange);
+      border: none;
+      border-radius: 10px;
+      padding: 14px;
+      margin-top: 6px;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 600;
+      font-size: 12px;
+      color: white;
+      letter-spacing: 0.18em;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 0 0 rgba(255,107,26,0);
+    }
+    .sp-cta:hover {
+      background: #e85e0e;
+      transform: translateY(-1px);
+      box-shadow: 0 8px 24px rgba(255,107,26,0.35);
+    }
+    .sp-status-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 1.1rem;
+      padding-top: 1.1rem;
+      border-top: 1px solid rgba(255,255,255,0.07);
+    }
+    .sp-status-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--sp-teal);
+      flex-shrink: 0;
+      animation: sp-pulse 2s ease-in-out infinite;
+    }
+    @keyframes sp-pulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.2; }
+    }
+    .sp-status-text {
+      font-family: 'Inter', sans-serif;
+      font-size: 10px;
+      color: rgba(255,255,255,0.22);
+      letter-spacing: 0.14em;
+    }
+
+    /* ── Deck widget ───────────────────────────────────────── */
+    .sp-deck {
+      position: fixed;
+      bottom: 1.5rem; left: 1.5rem;
+      z-index: 50;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 10px;
+      padding: 10px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      animation: sp-fade-up 0.6s 0.9s ease both;
+    }
+    .sp-deck-label {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 9px;
+      color: rgba(255,255,255,0.3);
+      letter-spacing: 0.18em;
+    }
+    .sp-deck-card {
+      width: 20px; height: 26px;
+      background: rgba(255,107,26,0.15);
+      border: 1px solid rgba(255,107,26,0.4);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--sp-orange);
+      font-size: 14px;
+      line-height: 1;
+    }
+    .sp-deck-count {
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      color: white;
+      font-weight: 500;
+    }
+
+    /* ── Brand pill (bottom-right) ─────────────────────────── */
+    .sp-sound {
+      position: fixed;
+      bottom: 1.5rem; right: 1.5rem;
+      z-index: 50;
+      animation: sp-fade-up 0.6s 1.0s ease both;
+    }
+    .sp-brand-pill {
+      display: flex;
+      align-items: center;
+      padding: 10px 24px;
+      background: rgba(10, 12, 22, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 999px;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.07);
+      transition: border-color 0.25s, box-shadow 0.25s;
+      cursor: default;
+      user-select: none;
+    }
+    .sp-brand-pill:hover {
+      border-color: rgba(255, 255, 255, 0.22);
+      box-shadow: 0 4px 32px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.1);
+    }
+    .sp-brand-pill img {
+      height: 28px;
+      width: auto;
+      display: block;
+      filter: brightness(1.05);
+    }
+
+    /* ── Footer ────────────────────────────────────────────── */
+    .sp-footer {
+      position: fixed;
+      bottom: 0.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 50;
+      font-family: 'Inter', sans-serif;
+      font-size: 10px;
+      color: rgba(255,255,255,0.12);
+      letter-spacing: 0.08em;
+      white-space: nowrap;
+      margin: 0;
+    }
+
+    /* ── Shared entrance keyframes ─────────────────────────── */
+    @keyframes sp-fade-up {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes sp-fade-down {
+      from { opacity: 0; transform: translateY(-18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes sp-fade-left {
+      from { opacity: 0; transform: translate(24px, -50%); }
+      to   { opacity: 1; transform: translate(0,   -50%); }
+    }
+
+    /* ── Stage system ──────────────────────────────────────── */
+    .sp-glass-card { max-height: calc(100vh - 90px); overflow-y: auto; scrollbar-width: none; }
+    .sp-glass-card::-webkit-scrollbar { display: none; }
+    .sp-hidden { display: none !important; }
+
+    .sp-stage-badge {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 9px; color: var(--sp-teal);
+      letter-spacing: 0.2em; text-align: center;
+      margin: 0 0 12px; border: 1px solid rgba(0,200,150,0.25);
+      border-radius: 999px; padding: 4px 0; display: block;
+    }
+    .sp-input {
+      width: 100%; background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.10); border-radius: 10px;
+      padding: 11px 14px; font-family: 'Inter', sans-serif;
+      font-size: 13px; color: white; outline: none;
+      margin-bottom: 10px; box-sizing: border-box; transition: border-color 0.2s;
+    }
+    .sp-input::placeholder { color: rgba(255,255,255,0.25); }
+    .sp-input:focus { border-color: var(--sp-orange); }
+    .sp-avatar-label {
+      font-family: 'Orbitron', sans-serif; font-size: 9px;
+      color: rgba(255,255,255,0.3); letter-spacing: 0.2em; margin: 2px 0 8px;
+    }
+    .sp-avatar-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 7px; margin-bottom: 14px; }
+    .sp-av-btn {
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px; padding: 8px 4px; display: flex; flex-direction: column;
+      align-items: center; gap: 4px; cursor: pointer; transition: all 0.15s;
+      font-size: 22px; color: rgba(255,255,255,0.6);
+    }
+    .sp-av-btn span {
+      font-family: 'Inter', sans-serif; font-size: 9px;
+      color: rgba(255,255,255,0.35); line-height: 1.2; text-align: center;
+    }
+    .sp-av-btn:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.18); }
+    .sp-av-btn.sp-selected { background: rgba(255,107,26,0.15); border-color: rgba(255,107,26,0.55); }
+    .sp-av-btn.sp-selected span { color: var(--sp-orange); }
+    .sp-stage-nav { display: flex; gap: 8px; align-items: stretch; }
+    .sp-back-btn {
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 10px; padding: 12px 14px; font-family: 'Orbitron', sans-serif;
+      font-size: 10px; color: rgba(255,255,255,0.4); letter-spacing: 0.12em;
+      cursor: pointer; transition: all 0.2s; white-space: nowrap; flex-shrink: 0;
+    }
+    .sp-back-btn:hover { background: rgba(255,255,255,0.10); color: rgba(255,255,255,0.7); }
+    .sp-cta-half { flex: 1; width: auto; margin-top: 0; padding: 12px 8px; font-size: 10px; }
+    .sp-cta:disabled,
+    .sp-cta:disabled:hover {
+      background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.22);
+      cursor: not-allowed; transform: none; box-shadow: none;
+    }
+    .sp-prog-card {
+      width: 100%; border-radius: 12px; padding: 12px 14px; margin-bottom: 8px;
+      text-align: left; cursor: pointer; transition: all 0.2s;
+      position: relative; overflow: hidden; box-sizing: border-box; display: block;
+    }
+    .sp-prog-active { background: rgba(255,107,26,0.08); border: 1px solid rgba(255,107,26,0.35); }
+    .sp-prog-active:hover { background: rgba(255,107,26,0.14); border-color: rgba(255,107,26,0.55); transform: translateY(-1px); }
+    .sp-prog-locked { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); opacity: 0.5; cursor: not-allowed; }
+    .sp-prog-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .sp-prog-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--sp-teal); flex-shrink: 0; animation: sp-pulse 2s ease-in-out infinite; }
+    .sp-prog-title { font-family: 'Orbitron', sans-serif; font-size: 11px; font-weight: 600; color: white; letter-spacing: 0.08em; flex: 1; }
+    .sp-prog-active-badge { font-family: 'Inter', sans-serif; font-size: 9px; color: var(--sp-teal); letter-spacing: 0.1em; }
+    .sp-prog-feats { font-family: 'Inter', sans-serif; font-size: 11px; color: rgba(255,255,255,0.5); display: flex; flex-direction: column; gap: 4px; }
+    .sp-prog-lock-overlay {
+      position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+      font-family: 'Orbitron', sans-serif; font-size: 11px; color: rgba(255,255,255,0.35);
+      letter-spacing: 0.12em; background: rgba(7,8,15,0.6); border-radius: 12px; z-index: 2;
+    }
+    .sp-reward-box {
+      background: rgba(255,107,26,0.06); border: 1px solid rgba(255,107,26,0.2);
+      border-radius: 10px; padding: 10px 14px; font-family: 'Inter', sans-serif;
+      font-size: 11px; color: rgba(255,255,255,0.55); text-align: center;
+      line-height: 1.5; margin-bottom: 12px; letter-spacing: 0.04em;
+    }
+    .sp-init-wrap {
+      padding: 6px 0; min-height: 180px;
+      display: flex; flex-direction: column; justify-content: center;
+    }
+    .sp-init-msg {
+      display: flex; align-items: center; gap: 10px;
+      font-family: 'Inter', sans-serif; font-size: 12px; color: rgba(255,255,255,0.6);
+      padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+      animation: sp-fade-up 0.4s ease both;
+    }
+    .sp-init-spinner {
+      font-size: 15px; color: var(--sp-orange);
+      animation: sp-spin 0.9s linear infinite;
+      display: inline-block; width: 18px; text-align: center; flex-shrink: 0;
+    }
+    @keyframes sp-spin { to { transform: rotate(360deg); } }
+    .sp-init-check { font-size: 15px; color: var(--sp-teal); display: inline-block; width: 18px; text-align: center; flex-shrink: 0; }
+    .sp-init-hello { font-family: 'Orbitron', sans-serif; font-size: 10px; color: rgba(255,255,255,0.35); letter-spacing: 0.2em; text-align: center; margin: 18px 0 4px; }
+    .sp-init-name-display { font-family: 'Orbitron', sans-serif; font-size: 20px; font-weight: 900; color: var(--sp-orange); letter-spacing: 0.08em; text-align: center; margin: 0; animation: sp-fade-up 0.5s ease both; }
+  </style>
+</head>
+<body>
+
+  <!-- z-0 ── Particle field ─────────────────────────────────── -->
+  <canvas id="sp-particles" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;"></canvas>
+
+  <!-- z-1 ── Grid ─────────────────────────────────────────────── -->
+  <div class="sp-grid" aria-hidden="true"></div>
+
+  <!-- z-2 ── Scan line ────────────────────────────────────────── -->
+  <div class="sp-scanline" aria-hidden="true"></div>
+
+  <!-- z-3 ── Vignette ─────────────────────────────────────────── -->
+  <div class="sp-vignette" aria-hidden="true"></div>
+
+  <!-- z-4 ── Ambient glow ─────────────────────────────────────── -->
+  <div class="sp-ambient" aria-hidden="true"></div>
+
+  <!-- z-10 ── Cyber Mannequin (centerpiece) ───────────────────── -->
+  <div class="sp-mannequin-wrap" aria-hidden="true">
+    <spline-viewer
+      url="https://my.spline.design/cybermannequin-TkpEookEZulTAId4uezLepvv/scene.splinecode"
+      loading-anim-type="spinner-small-dark"
+    ></spline-viewer>
+  </div>
+
+  <!-- Oval cover — hides "Built with Spline" badge ──────────── -->
+  <div class="sp-badge-cover" aria-hidden="true"></div>
+
+  <!-- z-10 ── Left title block ────────────────────────────────── -->
+  <div class="sp-title-block">
+    <h1 class="sp-hero-title">PYTHON</h1>
+    <p class="sp-hero-sub">PROGRAMMING</p>
+    <p class="sp-hero-author">— MUHAMMAD ZOHIB —</p>
+  </div>
+
+  <!-- z-100 ── Navbar ─────────────────────────────────────────── -->
+  <nav class="sp-navbar" role="navigation" aria-label="Main navigation">
+    <span class="sp-wordmark">python</span>
+    <div class="sp-nav-pills">
+      <button class="sp-pill" type="button">
+        <span class="sp-pill-dot sp-pill-dot--orange" aria-hidden="true"></span>
+        SUMMER CAMP
+      </button>
+      <button class="sp-pill" type="button">
+        <span class="sp-pill-dot sp-pill-dot--blue" aria-hidden="true"></span>
+        WELCOME ONLINE
+      </button>
+    </div>
+  </nav>
+
+
+  <!-- z-20 ── Right glassmorphic card ─────────────────────────── -->
+  <div class="sp-glass-card" role="complementary" aria-label="Academy welcome panel">
+    <div class="sp-bracket-tl" aria-hidden="true"></div>
+
+    <!-- ── Stage 0: Welcome ───── -->
+    <div id="sp-s0">
+      <div class="sp-card-rocket" aria-hidden="true">🚀</div>
+      <p class="sp-card-welcome">WELCOME TO</p>
+      <p class="sp-card-brand">ASHREI TECH</p>
+      <p class="sp-card-academy">ACADEMY</p>
+      <p class="sp-card-tagline">Build Games. Unlock Badges.<br>Become a Python Hero.</p>
+      <div class="sp-feature-row"><span aria-hidden="true">🎮</span> Build Real Games</div>
+      <div class="sp-feature-row"><span aria-hidden="true">🏆</span> Earn XP &amp; Badges</div>
+      <div class="sp-feature-row"><span aria-hidden="true">🚀</span> Unlock Missions</div>
+      <div class="sp-feature-row"><span aria-hidden="true">🐍</span> Learn Python Through Play</div>
+      <button class="sp-cta" id="sp-start-btn" type="button">⚡ START YOUR JOURNEY</button>
+      <div class="sp-status-row">
+        <div class="sp-status-dot" aria-hidden="true"></div>
+        <span class="sp-status-text">SECURE SESSION ACTIVE</span>
+      </div>
+    </div>
+
+    <!-- ── Stage 1: Create Profile ───── -->
+    <div id="sp-s1" class="sp-hidden">
+      <p class="sp-stage-badge">STAGE 1 OF 3</p>
+      <p class="sp-card-brand" style="font-size:17px;margin-bottom:2px">CREATE YOUR</p>
+      <p class="sp-card-academy" style="margin-bottom:14px">PLAYER PROFILE</p>
+      <input class="sp-input" id="sp-name-inp" type="text" placeholder="Your Name" maxlength="32" autocomplete="off" />
+      <input class="sp-input" id="sp-tag-inp"  type="text" placeholder="Gamer Tag / Nickname" maxlength="24" autocomplete="off" />
+      <p class="sp-avatar-label">CHOOSE AVATAR</p>
+      <div class="sp-avatar-grid">
+        <button class="sp-av-btn" data-emoji="🤖" data-label="Cyber Bot"      type="button">🤖<span>Cyber Bot</span></button>
+        <button class="sp-av-btn" data-emoji="🚀" data-label="Rocket Captain" type="button">🚀<span>Rocket Captain</span></button>
+        <button class="sp-av-btn" data-emoji="🥷" data-label="Code Ninja"     type="button">🥷<span>Code Ninja</span></button>
+        <button class="sp-av-btn" data-emoji="⚡" data-label="Neon Runner"    type="button">⚡<span>Neon Runner</span></button>
+        <button class="sp-av-btn" data-emoji="🧙" data-label="Pixel Wizard"   type="button">🧙<span>Pixel Wizard</span></button>
+        <button class="sp-av-btn" data-emoji="👾" data-label="Game Hacker"    type="button">👾<span>Game Hacker</span></button>
+      </div>
+      <div class="sp-stage-nav">
+        <button class="sp-back-btn" id="sp-back-1" type="button">← BACK</button>
+        <button class="sp-cta sp-cta-half" id="sp-create-btn" type="button" disabled>CREATE PROFILE →</button>
+      </div>
+    </div>
+
+    <!-- ── Stage 2: Select Program ───── -->
+    <div id="sp-s2" class="sp-hidden">
+      <p class="sp-stage-badge">STAGE 2 OF 3</p>
+      <p class="sp-card-brand" style="font-size:17px;margin-bottom:2px">SELECT YOUR</p>
+      <p class="sp-card-academy" style="margin-bottom:14px">MISSION PROGRAM</p>
+      <button class="sp-prog-card sp-prog-active" id="sp-prog-12" type="button">
+        <div class="sp-prog-head">
+          <span class="sp-prog-dot"></span>
+          <span class="sp-prog-title">12-DAY BOOTCAMP</span>
+          <span class="sp-prog-active-badge">● ACTIVE</span>
+        </div>
+        <div class="sp-prog-feats">
+          <div>🎮 Build real Python games</div>
+          <div>🏆 12 XP badges to earn</div>
+          <div>🐍 Beginner friendly</div>
+          <div>🚀 Space Shooter final project</div>
+        </div>
+      </button>
+      <button class="sp-prog-card sp-prog-locked" type="button" disabled>
+        <div class="sp-prog-lock-overlay">🔒 COMING SOON</div>
+        <div class="sp-prog-head">
+          <span class="sp-prog-title">4-DAY INTENSIVE</span>
+        </div>
+        <div class="sp-prog-feats">
+          <div>⚡ Accelerated track</div>
+          <div>🎯 Advanced projects</div>
+        </div>
+      </button>
+      <div class="sp-reward-box">🏆 FINAL REWARD: BUILD YOUR OWN<br>SPACE SHOOTER GAME 🚀</div>
+      <button class="sp-back-btn" id="sp-back-2" type="button">← BACK</button>
+    </div>
+
+    <!-- ── Stage 3: Initializing ───── -->
+    <div id="sp-s3" class="sp-hidden">
+      <div class="sp-init-wrap">
+        <div id="sp-init-msgs"></div>
+        <div id="sp-init-welcome" class="sp-hidden">
+          <p class="sp-init-hello">WELCOME, COMMANDER</p>
+          <p class="sp-init-name-display" id="sp-init-player"></p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- z-50 ── Brand pill (bottom-right) ──────────────────────── -->
+  <div class="sp-sound">
+    <div class="sp-brand-pill">
+      <img src="/ashrei-logo.png" alt="ASHREI TECH" />
+    </div>
+  </div>
+
+  <!-- z-50 ── Footer ───────────────────────────────────────────── -->
+  <p class="sp-footer">All rights reserved &copy; 2025 Python Programming by Muhammad Zohib</p>
+
+  <!-- ── Particle system ────────────────────────────────────────── -->
+  <script>
+    (function () {
+      'use strict';
+
+      const canvas = document.getElementById('sp-particles');
+      const ctx    = canvas.getContext('2d');
+      let W, H;
+
+      function resize() {
+        W = canvas.width  = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+      }
+      resize();
+      window.addEventListener('resize', resize);
+
+      /* Build 100 particles */
+      const COUNT     = 100;
+      const particles = Array.from({ length: COUNT }, function () {
+        return {
+          x:       Math.random() * window.innerWidth,
+          y:       Math.random() * window.innerHeight,
+          size:    1 + Math.random() * 2,          /* 1 – 3 px diameter */
+          speed:   0.2 + Math.random() * 0.6,      /* 0.2 – 0.8 px/frame */
+          opacity: 0.3 + Math.random() * 0.5,      /* 0.3 – 0.8 */
+          teal:    Math.random() < 0.3,             /* 30 % teal, 70 % white */
+          offset:  Math.random() * Math.PI * 2,    /* horizontal wobble phase */
+        };
+      });
+
+      let time = 0;
+
+      function draw() {
+        ctx.clearRect(0, 0, W, H);
+        time += 0.01;
+
+        for (var i = 0; i < particles.length; i++) {
+          var p = particles[i];
+
+          /* Move upward with gentle horizontal sine wobble */
+          p.y -= p.speed;
+          p.x += Math.sin(time + p.offset) * 0.3;
+
+          /* Reset to bottom when particle exits top */
+          if (p.y + p.size < 0) {
+            p.y = H + p.size;
+            p.x = Math.random() * W;
+          }
+
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size / 2, 0, Math.PI * 2);
+          ctx.fillStyle = p.teal
+            ? 'rgba(0,200,150,' + p.opacity + ')'
+            : 'rgba(255,255,255,' + p.opacity + ')';
+          ctx.fill();
+        }
+
+        requestAnimationFrame(draw);
+      }
+
+      draw();
+    }());
+  </script>
+
+  <!-- ── Stage logic ────────────────────────────────────────────── -->
+  <script>
+    (function () {
+      'use strict';
+
+      var selectedEmoji = '';
+      var selectedLabel = '';
+      var playerName    = '';
+      var playerTag     = '';
+
+      var INIT_MSGS = [
+        'Initializing Academy Systems\u2026',
+        'Loading Missions\u2026',
+        'Spawning Training Bots\u2026',
+        'Activating XP Engine\u2026',
+        'Unlocking Day 1\u2026',
+      ];
+
+      /* Show only the requested stage */
+      function showStage(n) {
+        [0, 1, 2, 3].forEach(function (i) {
+          var el = document.getElementById('sp-s' + i);
+          if (el) el.classList.toggle('sp-hidden', i !== n);
+        });
+      }
+
+      /* Enable/disable CREATE PROFILE button */
+      function refreshCreateBtn() {
+        var btn  = document.getElementById('sp-create-btn');
+        var name = document.getElementById('sp-name-inp').value.trim();
+        if (btn) btn.disabled = !(name && selectedLabel);
+      }
+
+      /* Stage 0 → 1 */
+      document.getElementById('sp-start-btn').addEventListener('click', function () {
+        showStage(1);
+      });
+
+      /* Stage 1 → 0 */
+      document.getElementById('sp-back-1').addEventListener('click', function () {
+        showStage(0);
+      });
+
+      /* Stage 1: avatar clicks */
+      document.querySelectorAll('.sp-av-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          document.querySelectorAll('.sp-av-btn').forEach(function (b) {
+            b.classList.remove('sp-selected');
+          });
+          btn.classList.add('sp-selected');
+          selectedEmoji = btn.dataset.emoji;
+          selectedLabel = btn.dataset.label;
+          refreshCreateBtn();
+        });
+      });
+
+      /* Stage 1: name/tag input */
+      ['sp-name-inp', 'sp-tag-inp'].forEach(function (id) {
+        var el = document.getElementById(id);
+        if (el) el.addEventListener('input', refreshCreateBtn);
+      });
+
+      /* Stage 1 → 2 */
+      document.getElementById('sp-create-btn').addEventListener('click', function () {
+        playerName = document.getElementById('sp-name-inp').value.trim();
+        playerTag  = document.getElementById('sp-tag-inp').value.trim() || playerName;
+        if (!playerName || !selectedLabel) return;
+
+        /* ── Admin shortcut: unlock all days for testing ── */
+        if (playerName.toLowerCase() === 'admin123') {
+          localStorage.setItem('ashri-progress-v1', JSON.stringify({
+            onboardingDone:      true,
+            studentName:         'Admin (Test Mode)',
+            avatar:              'AD',
+            avatarEmoji:         '🛡️',
+            batch:               'ninjas',
+            experienceLevel:     'experienced',
+            gamerTag:            'admin123',
+            xp:                  9999,
+            streak:              0,
+            lastCompletedDate:   null,
+            completedDays:       [],
+            unlockedDays:        [1,2,3,4,5,6,7,8,9,10,11,12],
+            earnedBadges:        [],
+            completedChallenges: [],
+          }));
+          window.location.href = '/app.html';
+          return;
+        }
+
+        showStage(2);
+      });
+
+      /* Stage 2 → 1 */
+      document.getElementById('sp-back-2').addEventListener('click', function () {
+        showStage(1);
+      });
+
+      /* Stage 2: select 12-Day program → stage 3 */
+      document.getElementById('sp-prog-12').addEventListener('click', function () {
+        var existing = {};
+        try { existing = JSON.parse(localStorage.getItem('ashri-progress-v1') || '{}'); } catch (e) {}
+        localStorage.setItem('ashri-progress-v1', JSON.stringify(
+          Object.assign({}, existing, {
+            onboardingDone:  true,
+            studentName:     playerName,
+            gamerTag:        playerTag,
+            avatar:          playerName.slice(0, 2).toUpperCase(),
+            avatarEmoji:     selectedEmoji || '\uD83D\uDE80',
+            batch:           'morning',
+            experienceLevel: 'beginner',
+          })
+        ));
+        showStage(3);
+        runInit();
+      });
+
+      /* Stage 3: loading sequence */
+      function runInit() {
+        var container = document.getElementById('sp-init-msgs');
+        document.getElementById('sp-init-player').textContent = playerName.toUpperCase();
+        container.innerHTML = '';
+
+        INIT_MSGS.forEach(function (msg, i) {
+          setTimeout(function () {
+            var row  = document.createElement('div');
+            row.className = 'sp-init-msg';
+
+            var spin = document.createElement('span');
+            spin.className   = 'sp-init-spinner';
+            spin.textContent = '\u21BB'; /* ↻ */
+
+            var text = document.createElement('span');
+            text.textContent = msg;
+
+            row.appendChild(spin);
+            row.appendChild(text);
+            container.appendChild(row);
+
+            /* Flip spinner → check after 520 ms */
+            setTimeout(function () {
+              spin.className   = 'sp-init-check';
+              spin.textContent = '\u2713'; /* ✓ */
+            }, 520);
+          }, 400 + i * 640);
+        });
+
+        var afterAll = 400 + INIT_MSGS.length * 640;
+
+        /* Show welcome message */
+        setTimeout(function () {
+          document.getElementById('sp-init-welcome').classList.remove('sp-hidden');
+        }, afterAll + 400);
+
+        /* Navigate to academy */
+        setTimeout(function () {
+          window.location.href = '/app.html';
+        }, afterAll + 2400);
+      }
+
+    }());
+  </script>
+
+</body>
+</html>

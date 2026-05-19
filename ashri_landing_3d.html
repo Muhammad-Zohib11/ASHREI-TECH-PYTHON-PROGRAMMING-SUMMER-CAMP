@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ASHRI TECH — Begin Your Journey</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:     #04080f;
+  --cyan:   #00c8ff;
+  --cyan2:  #00ffe5;
+  --orange: #ff6b00;
+  --white:  #f0f8ff;
+  --dim:    #8ca0b8;
+  --card:   rgba(0,200,255,0.05);
+  --border: rgba(0,200,255,0.18);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:'Exo 2',sans-serif;color:var(--white);}
+
+/* ── THREE.JS CANVAS ─ */
+#threeCanvas{position:fixed;inset:0;z-index:50;pointer-events:none;}
+
+/* ── STARFIELD ─ */
+#starfield{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;}
+.star{position:absolute;border-radius:50%;background:#fff;animation:twinkle var(--d) ease-in-out infinite alternate;}
+@keyframes twinkle{from{opacity:var(--min);}to{opacity:1;}}
+.shoot{position:absolute;height:2px;background:linear-gradient(90deg,transparent,#fff,var(--cyan));border-radius:999px;animation:shoot var(--sd) linear infinite;opacity:0;}
+@keyframes shoot{0%{opacity:0;transform:translate(0,0);}5%{opacity:1;}80%{opacity:.8;}100%{opacity:0;transform:translate(var(--sx),var(--sy));}}
+
+/* ── HEX GRID ─ */
+.hex-grid{position:fixed;inset:0;z-index:1;pointer-events:none;overflow:hidden;opacity:.04;}
+.hex-grid svg{width:100%;height:100%;}
+.scanlines{position:fixed;inset:0;z-index:2;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.07) 2px,rgba(0,0,0,.07) 4px);}
+
+/* ── ORBS ─ */
+.orb{position:fixed;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:1;}
+.orb1{width:500px;height:500px;background:rgba(0,200,255,.06);top:-150px;left:-150px;animation:driftOrb 14s ease-in-out infinite alternate;}
+.orb2{width:350px;height:350px;background:rgba(123,47,255,.07);bottom:-100px;right:-100px;animation:driftOrb 10s ease-in-out infinite alternate-reverse;}
+@keyframes driftOrb{from{transform:translate(0,0);}to{transform:translate(50px,40px);}}
+
+/* ── CORNERS ─ */
+.corner{position:fixed;z-index:5;pointer-events:none;}
+.corner.tl{top:1.2rem;left:1.2rem;}
+.corner.tr{top:1.2rem;right:1.2rem;transform:scaleX(-1);}
+.corner.bl{bottom:1.2rem;left:1.2rem;transform:scaleY(-1);}
+.corner.br{bottom:1.2rem;right:1.2rem;transform:scale(-1);}
+
+/* ── SLIDES ─ */
+#slides-wrapper{position:fixed;inset:0;z-index:10;display:flex;align-items:center;justify-content:center;padding:2rem;}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;opacity:0;pointer-events:none;transition:opacity .1s;}
+.slide.active{opacity:1;pointer-events:all;}
+.slide.enter-right{animation:enterRight .55s cubic-bezier(.22,1,.36,1) forwards;}
+.slide.exit-left  {animation:exitLeft  .45s cubic-bezier(.55,0,1,.45) forwards;}
+.slide.enter-left {animation:enterLeft .55s cubic-bezier(.22,1,.36,1) forwards;}
+.slide.exit-right {animation:exitRight .45s cubic-bezier(.55,0,1,.45) forwards;}
+@keyframes enterRight{from{opacity:0;transform:translateX(110%) scale(.95);}to{opacity:1;transform:translateX(0) scale(1);}}
+@keyframes exitLeft  {from{opacity:1;transform:translateX(0) scale(1);}to{opacity:0;transform:translateX(-110%) scale(.95);}}
+@keyframes enterLeft {from{opacity:0;transform:translateX(-110%) scale(.95);}to{opacity:1;transform:translateX(0) scale(1);}}
+@keyframes exitRight {from{opacity:1;transform:translateX(0) scale(1);}to{opacity:0;transform:translateX(110%) scale(.95);}}
+
+/* ── LOGO ─ */
+.logo{font-family:'Orbitron',sans-serif;font-size:clamp(1rem,2.5vw,1.4rem);font-weight:900;letter-spacing:.25em;color:var(--cyan);text-shadow:0 0 20px var(--cyan),0 0 40px rgba(0,200,255,.4);margin-bottom:.3rem;animation:pulseLogo 3s ease-in-out infinite alternate;}
+@keyframes pulseLogo{from{text-shadow:0 0 15px var(--cyan),0 0 30px rgba(0,200,255,.3);}to{text-shadow:0 0 30px var(--cyan),0 0 60px rgba(0,200,255,.6),0 0 100px rgba(0,200,255,.2);}}
+.tagline{font-size:clamp(.6rem,1.3vw,.75rem);letter-spacing:.35em;color:var(--dim);text-transform:uppercase;margin-bottom:2.5rem;}
+
+/* ── CARD ─ */
+.card{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:clamp(1.6rem,4vw,2.6rem) clamp(1.8rem,5vw,3.2rem);width:min(500px,90vw);backdrop-filter:blur(28px);box-shadow:0 0 60px rgba(0,200,255,.08),inset 0 1px 0 rgba(255,255,255,.07);position:relative;overflow:hidden;}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);animation:scanLine 3s linear infinite;}
+@keyframes scanLine{from{opacity:0;transform:translateX(-100%);}50%{opacity:1;}to{opacity:0;transform:translateX(100%);}}
+
+.slide-title{font-family:'Orbitron',sans-serif;font-size:clamp(1rem,2.2vw,1.3rem);font-weight:700;color:var(--white);margin-bottom:.4rem;text-align:center;}
+.slide-sub{font-size:clamp(.75rem,1.4vw,.85rem);color:var(--dim);text-align:center;margin-bottom:1.8rem;line-height:1.6;}
+
+/* ── INPUT ─ */
+.input-wrap{position:relative;margin-bottom:1.6rem;}
+.input-wrap label{display:block;font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--cyan);margin-bottom:.5rem;}
+.name-input{width:100%;background:rgba(0,200,255,.05);border:1.5px solid var(--border);border-radius:12px;padding:.9rem 1.1rem;font-family:'Exo 2',sans-serif;font-size:1rem;color:var(--white);outline:none;transition:border-color .3s,box-shadow .3s;caret-color:var(--cyan);}
+.name-input::placeholder{color:rgba(140,160,184,.4);}
+.name-input:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(0,200,255,.12),0 0 20px rgba(0,200,255,.1);}
+
+/* ── BUTTONS ─ */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;width:100%;padding:.85rem 1.4rem;border:none;border-radius:12px;font-family:'Orbitron',sans-serif;font-size:.78rem;font-weight:700;letter-spacing:.1em;cursor:pointer;transition:transform .18s,box-shadow .18s;position:relative;overflow:hidden;}
+.btn::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.15) 0%,transparent 60%);opacity:0;transition:opacity .2s;}
+.btn:hover::after{opacity:1;}
+.btn:hover{transform:translateY(-2px);}
+.btn:active{transform:translateY(0);}
+.btn-primary{background:linear-gradient(135deg,var(--cyan),#0080ff);color:#000;box-shadow:0 4px 24px rgba(0,200,255,.35);}
+.btn-primary:hover{box-shadow:0 8px 32px rgba(0,200,255,.5);}
+.btn-primary:disabled{opacity:.35;pointer-events:none;}
+.btn-launch{background:linear-gradient(135deg,var(--orange),#ff2d78);color:#fff;box-shadow:0 4px 28px rgba(255,107,0,.4);}
+.btn-launch:hover{box-shadow:0 8px 36px rgba(255,107,0,.6);}
+
+/* ── PLAN CARDS ─ */
+.plans{display:grid;grid-template-columns:1fr 1fr;gap:.9rem;margin-bottom:1.6rem;}
+.plan-card{border:2px solid var(--border);border-radius:16px;padding:1.3rem .9rem;cursor:pointer;transition:all .25s;text-align:center;background:rgba(0,200,255,.03);position:relative;overflow:hidden;}
+.plan-card:hover{transform:translateY(-3px);border-color:rgba(0,200,255,.5);box-shadow:0 8px 30px rgba(0,200,255,.15);}
+.plan-card.selected{border-color:var(--cyan);background:rgba(0,200,255,.1);box-shadow:0 0 30px rgba(0,200,255,.2),inset 0 0 30px rgba(0,200,255,.05);}
+.plan-card.selected::before{content:'✓';position:absolute;top:8px;right:10px;font-size:.7rem;color:var(--cyan);font-family:'Orbitron',sans-serif;}
+.plan-icon{font-size:2rem;margin-bottom:.5rem;display:block;animation:floatIcon 3s ease-in-out infinite alternate;}
+@keyframes floatIcon{from{transform:translateY(0);}to{transform:translateY(-5px);}}
+.plan-name{font-family:'Orbitron',sans-serif;font-size:.74rem;font-weight:700;color:var(--white);letter-spacing:.06em;margin-bottom:.25rem;}
+.plan-days{font-size:.65rem;color:var(--dim);}
+.plan-xp{display:inline-block;margin-top:.5rem;font-size:.62rem;padding:2px 8px;border-radius:999px;background:rgba(0,200,255,.12);color:var(--cyan);font-family:'Orbitron',sans-serif;}
+
+/* ── AVATARS ─ */
+.avatars{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem;margin-bottom:1.6rem;}
+.avatar-btn{border:2px solid var(--border);border-radius:14px;padding:.7rem .3rem .5rem;cursor:pointer;background:rgba(0,200,255,.03);transition:all .25s;text-align:center;display:flex;flex-direction:column;align-items:center;gap:.3rem;}
+.avatar-btn:hover{transform:translateY(-4px) scale(1.05);border-color:rgba(0,200,255,.5);}
+.avatar-btn.selected{border-color:var(--cyan);background:rgba(0,200,255,.1);box-shadow:0 0 24px rgba(0,200,255,.2);transform:scale(1.07);}
+.av-emoji{font-size:1.8rem;line-height:1;display:block;}
+.av-name{font-size:.58rem;color:var(--dim);}
+.avatar-btn.selected .av-name{color:var(--cyan);}
+
+/* ── WELCOME HERO ─ */
+.welcome-hero{text-align:center;margin-bottom:1.8rem;}
+.rocket-icon{font-size:3.5rem;display:block;margin-bottom:.8rem;animation:rocketFloat 2.5s ease-in-out infinite;}
+@keyframes rocketFloat{0%,100%{transform:translateY(0) rotate(-5deg);}50%{transform:translateY(-12px) rotate(5deg);}}
+.hero-title{font-family:'Orbitron',sans-serif;font-size:clamp(1.4rem,4vw,2.1rem);font-weight:900;line-height:1.15;background:linear-gradient(135deg,var(--cyan),#fff,var(--cyan2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.5rem;}
+.hero-sub{font-size:clamp(.75rem,1.6vw,.88rem);color:var(--dim);line-height:1.6;}
+
+/* ── LAUNCH SCREEN ─ */
+.chosen-av{font-size:4.5rem;display:block;margin:0 auto .8rem;animation:popIn .6s cubic-bezier(.22,1,.36,1) both;}
+@keyframes popIn{from{transform:scale(0) rotate(-180deg);opacity:0;}to{transform:scale(1) rotate(0);opacity:1;}}
+.chosen-name{font-family:'Orbitron',sans-serif;font-size:clamp(1.2rem,2.5vw,1.6rem);font-weight:900;color:var(--cyan);text-align:center;margin-bottom:.3rem;text-shadow:0 0 20px rgba(0,200,255,.5);}
+.chosen-plan-txt{font-size:.78rem;color:var(--dim);text-align:center;margin-bottom:1.6rem;letter-spacing:.1em;}
+
+/* ── BACK / STEP ─ */
+.back-btn{position:absolute;top:1rem;left:1rem;background:none;border:1px solid var(--border);border-radius:8px;padding:.3rem .7rem;color:var(--dim);font-size:.68rem;cursor:pointer;font-family:'Exo 2',sans-serif;letter-spacing:.06em;transition:all .2s;display:flex;align-items:center;gap:.3rem;}
+.back-btn:hover{border-color:var(--cyan);color:var(--cyan);}
+.step-counter{position:absolute;top:1rem;right:1rem;font-size:.62rem;color:var(--dim);font-family:'Orbitron',sans-serif;letter-spacing:.12em;}
+.step-counter span{color:var(--cyan);}
+
+/* ── PROGRESS DOTS ─ */
+.progress-dots{position:fixed;bottom:1.8rem;left:50%;transform:translateX(-50%);display:flex;gap:.5rem;z-index:20;}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--border);transition:all .35s;}
+.dot.active{background:var(--cyan);box-shadow:0 0 10px var(--cyan);width:24px;border-radius:4px;}
+
+/* ── KEY HINTS ─ */
+#keyHints{position:fixed;bottom:3.8rem;left:50%;transform:translateX(-50%);z-index:20;display:flex;gap:1.2rem;align-items:center;font-size:.62rem;color:rgba(140,160,184,.6);letter-spacing:.08em;white-space:nowrap;}
+.kh{display:flex;align-items:center;gap:.35rem;}
+.kh kbd{display:inline-block;background:rgba(0,200,255,.08);border:1px solid rgba(0,200,255,.2);border-radius:4px;padding:2px 6px;font-size:.6rem;font-family:'Orbitron',sans-serif;color:var(--cyan);}
+
+/* ── CONFETTI ─ */
+.confetti-piece{position:fixed;pointer-events:none;z-index:200;border-radius:2px;animation:confettiFall var(--cf-d) ease-in var(--cf-delay) both;}
+@keyframes confettiFall{0%{transform:translateY(-20px) rotateZ(0) translateX(0);opacity:1;}100%{transform:translateY(110vh) rotateZ(720deg) translateX(var(--cf-x));opacity:0;}}
+</style>
+</head>
+<body>
+
+<!-- ── BG LAYERS ─ -->
+<div id="starfield"></div>
+<div class="orb orb1"></div><div class="orb orb2"></div>
+<div class="hex-grid"><svg xmlns="http://www.w3.org/2000/svg"><defs><pattern id="hex" x="0" y="0" width="60" height="52" patternUnits="userSpaceOnUse"><polygon points="30,2 58,17 58,47 30,62 2,47 2,17" fill="none" stroke="#00c8ff" stroke-width=".8"/></pattern></defs><rect width="100%" height="100%" fill="url(#hex)"/></svg></div>
+<div class="scanlines"></div>
+
+<!-- corners -->
+<div class="corner tl"><svg width="40" height="40" viewBox="0 0 40 40" fill="none"><path d="M0 40 L0 0 L40 0" stroke="#00c8ff" stroke-width="2" opacity=".6"/><circle cx="0" cy="0" r="4" fill="#00c8ff" opacity=".8"/></svg></div>
+<div class="corner tr"><svg width="40" height="40" viewBox="0 0 40 40" fill="none"><path d="M0 40 L0 0 L40 0" stroke="#00c8ff" stroke-width="2" opacity=".6"/><circle cx="0" cy="0" r="4" fill="#00c8ff" opacity=".8"/></svg></div>
+<div class="corner bl"><svg width="40" height="40" viewBox="0 0 40 40" fill="none"><path d="M0 40 L0 0 L40 0" stroke="#00c8ff" stroke-width="2" opacity=".6"/><circle cx="0" cy="0" r="4" fill="#00c8ff" opacity=".8"/></svg></div>
+<div class="corner br"><svg width="40" height="40" viewBox="0 0 40 40" fill="none"><path d="M0 40 L0 0 L40 0" stroke="#00c8ff" stroke-width="2" opacity=".6"/><circle cx="0" cy="0" r="4" fill="#00c8ff" opacity=".8"/></svg></div>
+
+<!-- ── THREE.JS CANVAS ─ -->
+<canvas id="threeCanvas"></canvas>
+
+<!-- ── SLIDES ─ -->
+<div id="slides-wrapper">
+
+  <!-- SLIDE 0: WELCOME -->
+  <div class="slide active" id="slide-0">
+    <div class="logo">ASHRI TECH</div>
+    <div class="tagline">AI & Python Programming Bootcamp</div>
+    <div class="card">
+      <div class="welcome-hero">
+        <span class="rocket-icon">🚀</span>
+        <div class="hero-title">Begin Your<br>Coding Adventure</div>
+        <div class="hero-sub">Turn from a player into a creator.<br>Build real games with real Python.</div>
+      </div>
+      <button class="btn btn-primary" onclick="goTo(1)">⚡ Start My Journey</button>
+    </div>
+  </div>
+
+  <!-- SLIDE 1: NAME -->
+  <div class="slide" id="slide-1">
+    <div class="logo">ASHRI TECH</div>
+    <div class="tagline">Step 1 of 3</div>
+    <div class="card">
+      <button class="back-btn" onclick="goTo(0,'back')">← Back</button>
+      <div class="step-counter"><span>01</span> / 03</div>
+      <div class="slide-title">What's Your Name, Hero?</div>
+      <div class="slide-sub">Every legend has a name. Tell us yours.</div>
+      <div class="input-wrap">
+        <label>Your Hero Name</label>
+        <input type="text" class="name-input" id="nameInput" placeholder="e.g. Alex, Luna, Zara…" maxlength="20" oninput="checkName()" onkeydown="if(event.key==='Enter')tryNext1()">
+      </div>
+      <button class="btn btn-primary" id="btn1" onclick="tryNext1()" disabled>Continue →</button>
+    </div>
+  </div>
+
+  <!-- SLIDE 2: PLAN -->
+  <div class="slide" id="slide-2">
+    <div class="logo">ASHRI TECH</div>
+    <div class="tagline">Step 2 of 3</div>
+    <div class="card">
+      <button class="back-btn" onclick="goTo(1,'back')">← Back</button>
+      <div class="step-counter"><span>02</span> / 03</div>
+      <div class="slide-title">Choose Your Mission</div>
+      <div class="slide-sub">Which bootcamp plan fits your adventure?</div>
+      <div class="plans">
+        <div class="plan-card" onclick="selectPlan('12-Day Plan',this)">
+          <span class="plan-icon">🏆</span>
+          <div class="plan-name">12-DAY PLAN</div>
+          <div class="plan-days">Full Bootcamp</div>
+          <span class="plan-xp">4,570 XP</span>
+        </div>
+        <div class="plan-card" onclick="selectPlan('4-Day Plan',this)">
+          <span class="plan-icon" style="animation-delay:1.5s">⚡</span>
+          <div class="plan-name">4-DAY PLAN</div>
+          <div class="plan-days">Rapid Launch</div>
+          <span class="plan-xp">1,200 XP</span>
+        </div>
+      </div>
+      <button class="btn btn-primary" id="btn2" onclick="goTo(3)" disabled>Choose My Plan →</button>
+    </div>
+  </div>
+
+  <!-- SLIDE 3: AVATAR -->
+  <div class="slide" id="slide-3">
+    <div class="logo">ASHRI TECH</div>
+    <div class="tagline">Step 3 of 3</div>
+    <div class="card">
+      <button class="back-btn" onclick="goTo(2,'back')">← Back</button>
+      <div class="step-counter"><span>03</span> / 03</div>
+      <div class="slide-title">Pick Your Avatar</div>
+      <div class="slide-sub">Choose the hero that represents you!</div>
+      <div class="avatars" id="avatarGrid"></div>
+      <button class="btn btn-primary" id="btn3" onclick="goTo(4)" disabled>Lock In My Avatar →</button>
+    </div>
+  </div>
+
+  <!-- SLIDE 4: LAUNCH -->
+  <div class="slide" id="slide-4">
+    <div class="logo">ASHRI TECH</div>
+    <div class="tagline">Mission Ready</div>
+    <div class="card" style="text-align:center;">
+      <span class="chosen-av" id="chosenAv">🚀</span>
+      <div class="chosen-name" id="chosenName">Hero</div>
+      <div class="chosen-plan-txt" id="chosenPlan">12-DAY PLAN · 4,570 XP AVAILABLE</div>
+      <div style="font-size:.8rem;color:var(--dim);margin-bottom:1.6rem;line-height:1.7;">Your cockpit is ready.<br>Systems online. Engines hot.<br>Time to become a Python Legend. 🏆</div>
+      <button class="btn btn-launch" onclick="launch()">🚀 &nbsp;LAUNCH INTO ASHRI TECH</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── PROGRESS DOTS ─ -->
+<div class="progress-dots">
+  <div class="dot active" id="dot0"></div>
+  <div class="dot" id="dot1"></div>
+  <div class="dot" id="dot2"></div>
+  <div class="dot" id="dot3"></div>
+</div>
+
+<!-- ── KEY HINTS ─ -->
+<div id="keyHints">
+  <div class="kh"><kbd>←</kbd><kbd>→</kbd> Orbit Direction</div>
+  <div class="kh"><kbd>↑</kbd><kbd>↓</kbd> Orbit Speed</div>
+  <div class="kh">Move mouse · Head tracks you</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* ════════════════════════════════════════════════════
+   THREE.JS — 3D ASTRONAUT ORBITING THE CARD
+════════════════════════════════════════════════════ */
+(function initThree() {
+
+  const canvas = document.getElementById('threeCanvas');
+  const W = window.innerWidth, H = window.innerHeight;
+
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(W, H);
+  renderer.setClearColor(0x000000, 0); // transparent background
+
+  const scene = new THREE.Scene();
+
+  const camera = new THREE.PerspectiveCamera(55, W / H, 0.1, 1000);
+  camera.position.set(0, 0.5, 8);
+  camera.lookAt(0, 0, 0);
+
+  /* ── LIGHTS ─ */
+  scene.add(new THREE.AmbientLight(0x0a1a2e, 4));
+
+  const sunLight = new THREE.DirectionalLight(0xffffff, 1.2);
+  sunLight.position.set(5, 8, 5);
+  scene.add(sunLight);
+
+  const cyanFill = new THREE.PointLight(0x00c8ff, 2.5, 20);
+  cyanFill.position.set(-4, 2, 3);
+  scene.add(cyanFill);
+
+  const orangeBack = new THREE.PointLight(0xff6b00, 1.5, 15);
+  orangeBack.position.set(4, -2, -3);
+  scene.add(orangeBack);
+
+  /* ── ASTRONAUT LIGHT (moves with astronaut) ─ */
+  const astroLight = new THREE.PointLight(0x00c8ff, 1.8, 5);
+  scene.add(astroLight);
+
+  /* ════════════════════════════════════════
+     BUILD 3D ASTRONAUT
+  ════════════════════════════════════════ */
+  function mat(color, opts = {}) {
+    return new THREE.MeshPhongMaterial({ color, shininess: 60, ...opts });
+  }
+
+  function buildAstronaut() {
+    const root = new THREE.Group();
+
+    /* materials */
+    const mSuit   = mat(0xddeeff, { shininess: 80, specular: 0x334455 });
+    const mDark   = mat(0x0d2340, { shininess: 25 });
+    const mCyan   = mat(0x00c8ff, { shininess: 140, emissive: 0x003344, emissiveIntensity: 0.7 });
+    const mVisor  = mat(0x001020, { shininess: 240, transparent: true, opacity: 0.9, specular: 0x00c8ff });
+    const mOrange = mat(0xff5500, { emissive: 0x661100, emissiveIntensity: 0.9 });
+    const mGold   = mat(0xffc040, { shininess: 120 });
+    const mGreen  = mat(0x00ff88, { emissive: 0x004422, emissiveIntensity: 0.7, shininess: 100 });
+    const mRed    = mat(0xff3333, { emissive: 0x440000, emissiveIntensity: 0.7, shininess: 100 });
+    const mWhite  = mat(0xffffff, { transparent: true, opacity: 0.12 });
+
+    /* ── HEAD GROUP (tracks mouse) ─ */
+    const headGroup = new THREE.Group();
+    headGroup.position.y = 0.9;
+
+    // Helmet sphere
+    headGroup.add(mesh(new THREE.SphereGeometry(0.35, 24, 24), mSuit));
+
+    // Visor dark face
+    const visor = mesh(new THREE.SphereGeometry(0.28, 20, 20), mVisor);
+    visor.position.z = 0.09;
+    headGroup.add(visor);
+
+    // Visor glare highlight
+    const glare = mesh(new THREE.SphereGeometry(0.07, 10, 10), mWhite);
+    glare.position.set(-0.09, 0.08, 0.33);
+    headGroup.add(glare);
+
+    // Side warning lights
+    const redLight = mesh(new THREE.BoxGeometry(0.07, 0.06, 0.06), mRed);
+    redLight.position.set(-0.31, 0.06, 0.13);
+    headGroup.add(redLight);
+
+    const greenLt = mesh(new THREE.BoxGeometry(0.07, 0.06, 0.06), mGreen);
+    greenLt.position.set(0.31, 0.06, 0.13);
+    headGroup.add(greenLt);
+
+    // Antenna stem
+    const antStem = mesh(new THREE.CylinderGeometry(0.012, 0.015, 0.25, 8), mSuit);
+    antStem.position.y = 0.42;
+    headGroup.add(antStem);
+
+    // Antenna tip (emissive, pulsing)
+    const antTip = mesh(new THREE.SphereGeometry(0.04, 12, 12), mCyan.clone());
+    antTip.position.y = 0.56;
+    headGroup.add(antTip);
+
+    root.add(headGroup);
+
+    /* ── NECK ─ */
+    root.add(positioned(mesh(new THREE.CylinderGeometry(0.1, 0.12, 0.1, 12), mDark), 0, 0.53, 0));
+
+    /* ── TORSO ─ */
+    const torso = mesh(new THREE.CylinderGeometry(0.29, 0.25, 0.62, 14), mSuit);
+    torso.position.y = 0.18;
+    root.add(torso);
+
+    // Chest panel
+    const panel = mesh(new THREE.BoxGeometry(0.34, 0.22, 0.07), mDark);
+    panel.position.set(0, 0.26, 0.24);
+    root.add(panel);
+
+    // Panel glow strip
+    const strip = mesh(new THREE.BoxGeometry(0.28, 0.025, 0.07), mCyan.clone());
+    strip.position.set(0, 0.31, 0.25);
+    root.add(strip);
+
+    // Chest main light
+    const chestLight = mesh(new THREE.SphereGeometry(0.05, 12, 12), mCyan.clone());
+    chestLight.position.set(0, 0.22, 0.29);
+    root.add(chestLight);
+
+    // Panel buttons
+    [[-0.09, 0.14, mRed], [0, 0.14, mGold], [0.09, 0.14, mGreen]].forEach(([x, y, m]) => {
+      const btn = mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.04, 8), m.clone());
+      btn.rotation.x = Math.PI / 2;
+      btn.position.set(x, y + 0.095, 0.29);
+      root.add(btn);
+    });
+
+    /* ── ARMS ─ */
+    function arm(side) {
+      const g = new THREE.Group();
+      // upper arm
+      const upper = mesh(new THREE.CylinderGeometry(0.085, 0.075, 0.35, 10), mSuit.clone());
+      upper.position.y = -0.175;
+      g.add(upper);
+      // elbow joint
+      g.add(positioned(mesh(new THREE.SphereGeometry(0.08, 10, 10), mDark.clone()), 0, -0.35, 0));
+      // forearm
+      const fore = mesh(new THREE.CylinderGeometry(0.075, 0.065, 0.3, 10), mSuit.clone());
+      fore.position.y = -0.53;
+      g.add(fore);
+      // glove
+      const glove = mesh(new THREE.SphereGeometry(0.1, 12, 12), mCyan.clone());
+      glove.position.y = -0.72;
+      g.add(glove);
+      // position arm
+      g.position.set(side * 0.38, 0.37, 0);
+      g.rotation.z = side * -0.38;
+      return g;
+    }
+    root.add(arm(-1));
+    root.add(arm(1));
+
+    /* ── LEGS ─ */
+    function leg(side) {
+      const g = new THREE.Group();
+      // upper leg
+      g.add(positioned(mesh(new THREE.CylinderGeometry(0.12, 0.1, 0.52, 10), mSuit.clone()), 0, -0.26, 0));
+      // knee pad
+      g.add(positioned(mesh(new THREE.BoxGeometry(0.16, 0.12, 0.16), mDark.clone()), 0, -0.18, 0.08));
+      // lower leg
+      g.add(positioned(mesh(new THREE.CylinderGeometry(0.1, 0.09, 0.44, 10), mSuit.clone()), 0, -0.58, 0));
+      // boot
+      const boot = mesh(new THREE.BoxGeometry(0.22, 0.14, 0.32), mDark.clone());
+      boot.position.set(0, -0.87, 0.06);
+      g.add(boot);
+      // boot toe light
+      const toelt = mesh(new THREE.BoxGeometry(0.06, 0.04, 0.04), mCyan.clone());
+      toelt.position.set(0, -0.87, 0.22);
+      g.add(toelt);
+      g.position.set(side * 0.155, -0.015, 0);
+      return g;
+    }
+    root.add(leg(-1));
+    root.add(leg(1));
+
+    /* ── JETPACK ─ */
+    const jp = mesh(new THREE.BoxGeometry(0.42, 0.56, 0.2), mDark.clone());
+    jp.position.set(0, 0.18, -0.31);
+    root.add(jp);
+
+    // jetpack cyan stripe
+    const jpStripe = mesh(new THREE.BoxGeometry(0.38, 0.035, 0.21), mCyan.clone());
+    jpStripe.position.set(0, 0.18, -0.3);
+    root.add(jpStripe);
+
+    // jetpack handle bars
+    [-0.14, 0.14].forEach(x => {
+      root.add(positioned(mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.18, 8), mDark.clone()), x, 0.42, -0.28));
+    });
+
+    /* ── THRUSTERS ─ */
+    const flame1 = mesh(new THREE.SphereGeometry(0.09, 12, 12), mOrange.clone());
+    const flame2 = mesh(new THREE.SphereGeometry(0.09, 12, 12), mOrange.clone());
+    [-0.12, 0.12].forEach((x, i) => {
+      const nozzle = mesh(new THREE.CylinderGeometry(0.07, 0.09, 0.16, 10), mDark.clone());
+      nozzle.position.set(x, -0.08, -0.4);
+      root.add(nozzle);
+      const fl = i === 0 ? flame1 : flame2;
+      fl.position.set(x, -0.22, -0.42);
+      root.add(fl);
+    });
+
+    // inner flame (yellow core)
+    [-0.12, 0.12].forEach(x => {
+      const core = mesh(new THREE.SphereGeometry(0.045, 8, 8), mat(0xffdd00, { emissive: 0xffaa00, emissiveIntensity: 1 }));
+      core.position.set(x, -0.22, -0.42);
+      root.add(core);
+    });
+
+    /* ── GLOW HALO ─ */
+    const halo = mesh(new THREE.SphereGeometry(1.1, 14, 14),
+      mat(0x00c8ff, { transparent: true, opacity: 0.04, side: THREE.BackSide }));
+    root.add(halo);
+
+    root.scale.set(0.48, 0.48, 0.48);
+
+    root.userData = { headGroup, antTip, chestLight, flame1, flame2, halo };
+    return root;
+  }
+
+  function mesh(geo, mat) { return new THREE.Mesh(geo, mat); }
+  function positioned(obj, x, y, z) { obj.position.set(x, y, z); return obj; }
+
+  const astronaut = buildAstronaut();
+  scene.add(astronaut);
+
+  /* ── ORBIT PATH (ellipse line) ─ */
+  const ORBIT_RH = 3.4;  // horizontal radius
+  const ORBIT_RZ = 2.0;  // depth radius
+
+  const orbitPts = [];
+  for (let i = 0; i <= 120; i++) {
+    const t = (i / 120) * Math.PI * 2;
+    orbitPts.push(new THREE.Vector3(
+      Math.cos(t) * ORBIT_RH,
+      Math.sin(t * 2) * 0.18, // slight vertical wave
+      Math.sin(t) * ORBIT_RZ
+    ));
+  }
+  const orbitLine = new THREE.Line(
+    new THREE.BufferGeometry().setFromPoints(orbitPts),
+    new THREE.LineBasicMaterial({ color: 0x00c8ff, transparent: true, opacity: 0.18 })
+  );
+  scene.add(orbitLine);
+
+  // Dashed secondary orbit ring (outer glow)
+  const orbitGlow = new THREE.Line(
+    new THREE.BufferGeometry().setFromPoints(orbitPts.map(p => p.clone())),
+    new THREE.LineBasicMaterial({ color: 0x00ffe5, transparent: true, opacity: 0.06 })
+  );
+  orbitGlow.scale.set(1.04, 1.04, 1.04);
+  scene.add(orbitGlow);
+
+  /* ── ORBIT MARKERS (small dots along path) ─ */
+  const markerGeo = new THREE.SphereGeometry(0.03, 6, 6);
+  const markerMat = new THREE.MeshBasicMaterial({ color: 0x00c8ff, transparent: true, opacity: 0.35 });
+  for (let i = 0; i < 24; i++) {
+    const t = (i / 24) * Math.PI * 2;
+    const m = new THREE.Mesh(markerGeo, markerMat);
+    m.position.set(
+      Math.cos(t) * ORBIT_RH,
+      Math.sin(t * 2) * 0.18,
+      Math.sin(t) * ORBIT_RZ
+    );
+    scene.add(m);
+  }
+
+  /* ── ASTEROID BELT (decorative) ─ */
+  const asteroidGeo = new THREE.DodecahedronGeometry(0.06, 0);
+  const asteroidMat = new THREE.MeshPhongMaterial({ color: 0x334466, shininess: 20 });
+  for (let i = 0; i < 18; i++) {
+    const t = (i / 18) * Math.PI * 2;
+    const r = ORBIT_RH * 1.55 + (Math.random() - 0.5) * 0.8;
+    const a = new THREE.Mesh(asteroidGeo, asteroidMat.clone());
+    a.position.set(
+      Math.cos(t) * r,
+      (Math.random() - 0.5) * 1.5,
+      Math.sin(t) * r * (ORBIT_RZ / ORBIT_RH)
+    );
+    a.scale.setScalar(0.4 + Math.random() * 0.8);
+    a.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
+    a.userData.rotSpeed = new THREE.Vector3(
+      (Math.random() - 0.5) * 0.01,
+      (Math.random() - 0.5) * 0.01,
+      (Math.random() - 0.5) * 0.01
+    );
+    scene.add(a);
+    window._asteroids = window._asteroids || [];
+    window._asteroids.push(a);
+  }
+
+  /* ── STAR PARTICLES (Three.js) ─ */
+  const starPts = [];
+  for (let i = 0; i < 800; i++) {
+    starPts.push((Math.random() - 0.5) * 80, (Math.random() - 0.5) * 60, (Math.random() - 0.5) * 80);
+  }
+  const starGeo = new THREE.BufferGeometry();
+  starGeo.setAttribute('position', new THREE.Float32BufferAttribute(starPts, 3));
+  scene.add(new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xffffff, size: 0.06, transparent: true, opacity: 0.6 })));
+
+  /* ── ORBIT STATE ─ */
+  let angle    = 0;
+  let speed    = 0.010;
+  let dir      = 1;
+  let targetSpeed = 0.010;
+
+  /* ── MOUSE TRACKING ─ */
+  let mouseX = 0, mouseY = 0;
+  window.addEventListener('mousemove', e => {
+    mouseX = (e.clientX / window.innerWidth  - 0.5) * 2;
+    mouseY = -(e.clientY / window.innerHeight - 0.5) * 2;
+  });
+
+  /* ── KEYBOARD ─ */
+  const keysDown = new Set();
+  window.addEventListener('keydown', e => {
+    keysDown.add(e.key);
+    if (['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)) e.preventDefault();
+  });
+  window.addEventListener('keyup', e => keysDown.delete(e.key));
+
+  /* ── ALL MATERIALS (for opacity control) ─ */
+  const allMeshes = [];
+  astronaut.traverse(o => { if (o.isMesh) allMeshes.push(o); });
+
+  /* ── CLOCK ─ */
+  const clock = new THREE.Clock();
+  let kickTime = 0; // for direction-change lean animation
+
+  /* ════════════════════════════════════════
+     ANIMATE LOOP
+  ════════════════════════════════════════ */
+  function animate() {
+    requestAnimationFrame(animate);
+    const t = clock.getElapsedTime();
+    const dt = clock.getDelta ? 0.016 : 0.016; // fixed step
+
+    /* keyboard input */
+    if (keysDown.has('ArrowLeft')  && dir !== -1) { dir = -1; kickTime = t; targetSpeed = 0.013; }
+    if (keysDown.has('ArrowRight') && dir !== 1)  { dir = 1;  kickTime = t; targetSpeed = 0.013; }
+    if (keysDown.has('ArrowUp'))   targetSpeed = Math.min(targetSpeed + 0.0003, 0.038);
+    if (keysDown.has('ArrowDown')) targetSpeed = Math.max(targetSpeed - 0.0003, 0.004);
+
+    // Smooth speed
+    speed += (targetSpeed - speed) * 0.05;
+
+    /* advance orbit */
+    angle += speed * dir;
+
+    /* orbit position (matches path definition) */
+    const ox = Math.cos(angle) * ORBIT_RH;
+    const oz = Math.sin(angle) * ORBIT_RZ;
+    const oy = Math.sin(angle * 2) * 0.18;
+
+    astronaut.position.set(ox, oy, oz);
+
+    /* face toward center (card) */
+    const faceAngle = Math.atan2(-ox, -oz);
+    const targetRotY = faceAngle;
+    astronaut.rotation.y += (targetRotY - astronaut.rotation.y) * 0.12;
+
+    /* lean in direction of motion when changing direction */
+    const kickAge = t - kickTime;
+    const kickLean = kickAge < 1.2 ? Math.sin(kickAge * Math.PI / 1.2) * 0.35 * dir : 0;
+    astronaut.rotation.z += (kickLean - astronaut.rotation.z) * 0.06;
+
+    /* forward pitch based on speed */
+    const speedLean = (speed - 0.010) * 4;
+    astronaut.rotation.x += (-speedLean - astronaut.rotation.x) * 0.04;
+
+    /* head tracks mouse */
+    const { headGroup, antTip, chestLight, flame1, flame2 } = astronaut.userData;
+    const hTargY = mouseX * 0.7;
+    const hTargX = mouseY * 0.45;
+    headGroup.rotation.y += (hTargY - headGroup.rotation.y) * 0.09;
+    headGroup.rotation.x += (hTargX - headGroup.rotation.x) * 0.09;
+
+    /* antenna pulse */
+    if (antTip && antTip.material) {
+      antTip.material.emissiveIntensity = 0.5 + 0.5 * Math.sin(t * 3);
+    }
+
+    /* chest light pulse */
+    if (chestLight && chestLight.material) {
+      chestLight.material.emissiveIntensity = 0.5 + 0.5 * Math.sin(t * 2.2 + 1);
+    }
+
+    /* flame flicker */
+    const flicker = 0.85 + 0.15 * Math.sin(t * 18 + Math.random() * 0.5);
+    const flicker2 = 0.85 + 0.15 * Math.sin(t * 14 + 1 + Math.random() * 0.5);
+    if (flame1) { flame1.scale.setScalar(flicker  * (0.8 + speed * 8)); }
+    if (flame2) { flame2.scale.setScalar(flicker2 * (0.8 + speed * 8)); }
+
+    /* depth opacity: darker when astronaut goes "behind" (negative z from camera) */
+    const zNorm = (oz + ORBIT_RZ) / (2 * ORBIT_RZ); // 0 (behind) → 1 (front)
+    const baseOpacity = 0.42 + 0.58 * zNorm;
+    allMeshes.forEach(m => {
+      if (m.material.transparent) {
+        // keep transparent materials at their own opacity (visor, halo etc)
+        if (m.material.opacity < 0.3) {
+          m.material.opacity = Math.min(m.material.opacity, baseOpacity * 0.15);
+        } else if (m.material.opacity < 0.95) {
+          m.material.opacity = baseOpacity * 0.92;
+        }
+      } else {
+        // opaque: no change — let depth naturally handle it
+      }
+    });
+
+    /* move astronaut light with astronaut */
+    astroLight.position.copy(astronaut.position);
+
+    /* rotate asteroids */
+    if (window._asteroids) {
+      window._asteroids.forEach(a => {
+        a.rotation.x += a.userData.rotSpeed.x;
+        a.rotation.y += a.userData.rotSpeed.y;
+      });
+    }
+
+    /* orbit line subtle pulse */
+    orbitLine.material.opacity = 0.14 + 0.06 * Math.sin(t * 0.8);
+
+    renderer.render(scene, camera);
+  }
+  animate();
+
+  /* ── RESIZE ─ */
+  window.addEventListener('resize', () => {
+    const W = window.innerWidth, H = window.innerHeight;
+    camera.aspect = W / H;
+    camera.updateProjectionMatrix();
+    renderer.setSize(W, H);
+  });
+
+})(); // end initThree
+
+
+/* ════════════════════════════════════════════════════
+   RETURNING USER — skip onboarding if already done
+════════════════════════════════════════════════════ */
+(function() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('ashri-progress-v1') || '{}');
+    if (saved.onboardingDone) window.location.replace('/app.html');
+  } catch(e) {}
+})();
+
+/* ════════════════════════════════════════════════════
+   HTML SLIDE SYSTEM
+════════════════════════════════════════════════════ */
+let currentSlide = 0;
+let chosenPlan = '', chosenAv = '', heroName = '';
+
+const AVATARS = [
+  {emoji:'🧑‍🚀',name:'Astronaut'}, {emoji:'🦸',name:'Hero'},
+  {emoji:'🧙‍♂️',name:'Wizard'},    {emoji:'🤖',name:'Robot'},
+  {emoji:'🐉',name:'Dragon'},    {emoji:'👾',name:'Alien'},
+  {emoji:'⚡',name:'Flash'},     {emoji:'🦊',name:'Fox'},
+];
+
+/* build avatar grid */
+(function() {
+  const g = document.getElementById('avatarGrid');
+  AVATARS.forEach(av => {
+    const b = document.createElement('div');
+    b.className = 'avatar-btn';
+    b.innerHTML = `<span class="av-emoji">${av.emoji}</span><span class="av-name">${av.name}</span>`;
+    b.onclick = () => {
+      chosenAv = av.emoji;
+      document.querySelectorAll('.avatar-btn').forEach(x => x.classList.remove('selected'));
+      b.classList.add('selected');
+      document.getElementById('btn3').disabled = false;
+    };
+    g.appendChild(b);
+  });
+})();
+
+function goTo(index, dir = 'forward') {
+  const cur = document.getElementById(`slide-${currentSlide}`);
+  const nxt = document.getElementById(`slide-${index}`);
+  if (!nxt) return;
+  cur.classList.remove('active');
+  cur.classList.add(dir === 'back' ? 'exit-right' : 'exit-left');
+  cur.addEventListener('animationend', () => cur.classList.remove('exit-right','exit-left'), { once: true });
+  nxt.classList.add('active', dir === 'back' ? 'enter-left' : 'enter-right');
+  nxt.addEventListener('animationend', () => nxt.classList.remove('enter-left','enter-right'), { once: true });
+  currentSlide = index;
+  document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === Math.min(index, 3)));
+  if (index === 4) populateLaunch();
+}
+
+function checkName() {
+  heroName = document.getElementById('nameInput').value.trim();
+  document.getElementById('btn1').disabled = heroName.length < 2;
+}
+function tryNext1() {
+  if (document.getElementById('nameInput').value.trim().length >= 2) goTo(2);
+}
+function selectPlan(name, el) {
+  chosenPlan = name;
+  document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('btn2').disabled = false;
+}
+function populateLaunch() {
+  heroName = document.getElementById('nameInput').value.trim();
+  document.getElementById('chosenAv').textContent   = chosenAv || '🚀';
+  document.getElementById('chosenName').textContent = heroName  || 'Hero';
+  document.getElementById('chosenPlan').textContent =
+    `${chosenPlan.toUpperCase()} · ${chosenPlan.startsWith('12') ? '4,570' : '1,200'} XP AVAILABLE`;
+}
+function launch() {
+  spawnConfetti();
+  const btn = document.querySelector('.btn-launch');
+  btn.textContent = '🚀 LAUNCHING…';
+  btn.disabled = true;
+
+  // Save onboarding data to localStorage (key matches ProgressContext.jsx)
+  const STORAGE_KEY = 'ashri-progress-v1';
+  let existing = {};
+  try { existing = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch(e) {}
+  const initials = (heroName || 'HE').trim().slice(0, 2).toUpperCase();
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({
+    ...existing,
+    onboardingDone:      true,
+    studentName:         heroName.trim(),
+    avatar:              initials,
+    avatarEmoji:         chosenAv  || '🚀',
+    batch:               chosenPlan || '12-Day Plan',
+    experienceLevel:     'beginner',
+    gamerTag:            '',
+    xp:                  existing.xp              || 0,
+    streak:              existing.streak          || 0,
+    lastCompletedDate:   existing.lastCompletedDate || null,
+    completedDays:       existing.completedDays   || [],
+    unlockedDays:        existing.unlockedDays    || [1],
+    earnedBadges:        existing.earnedBadges    || [],
+    completedChallenges: existing.completedChallenges || [],
+  }));
+
+  setTimeout(() => {
+    window.location.href = '/app.html';
+  }, 1200);
+}
+
+/* ── CONFETTI ─ */
+function spawnConfetti() {
+  const cols = ['#00c8ff','#ff6b00','#22c55e','#7b2fff','#ffdd00','#ff2d78','#00ffe5'];
+  const frag = document.createDocumentFragment();
+  for (let i = 0; i < 90; i++) {
+    const p = document.createElement('div');
+    p.className = 'confetti-piece';
+    p.style.cssText = `left:${Math.random()*100}%;background:${cols[Math.floor(Math.random()*cols.length)]};--cf-d:${(Math.random()*2+1).toFixed(1)}s;--cf-delay:${(Math.random()*.8).toFixed(2)}s;--cf-x:${((Math.random()-.5)*600).toFixed(0)}px;width:${Math.random()*8+4}px;height:${Math.random()*8+4}px;border-radius:${Math.random()>.5?'50%':'2px'};`;
+    frag.appendChild(p);
+    setTimeout(() => p.remove(), 4000);
+  }
+  document.body.appendChild(frag);
+}
+
+/* ── CSS STARFIELD ─ */
+(function() {
+  const sf = document.getElementById('starfield');
+  const frag = document.createDocumentFragment();
+  for (let i = 0; i < 150; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const sz = Math.random() * 2 + 0.4;
+    s.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*100}%;width:${sz}px;height:${sz}px;--min:${(Math.random()*.3+.1).toFixed(2)};--d:${(Math.random()*3+2).toFixed(1)}s;animation-delay:${(Math.random()*5).toFixed(1)}s;`;
+    frag.appendChild(s);
+  }
+  for (let i = 0; i < 4; i++) {
+    const sh = document.createElement('div');
+    sh.className = 'shoot';
+    sh.style.cssText = `top:${Math.random()*60}%;left:${Math.random()*60}%;width:${Math.random()*120+60}px;--sx:${(Math.random()*300+100).toFixed(0)}px;--sy:${(Math.random()*200+50).toFixed(0)}px;--sd:${(Math.random()*4+3).toFixed(1)}s;animation-delay:${(Math.random()*8).toFixed(1)}s;`;
+    frag.appendChild(sh);
+  }
+  sf.appendChild(frag);
+})();
+</script>
+</body>
+</html>

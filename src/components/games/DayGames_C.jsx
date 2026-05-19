@@ -80,11 +80,14 @@ export function Day9Game({ color }) {
   return (
     <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:12}}>
       <canvas ref={cvRef} width={W} height={H} tabIndex={0} onClick={startGame} style={{borderRadius:12,border:`2px solid ${color}40`,outline:'none',cursor:'crosshair',display:'block'}}/>
-      <div style={{display:'flex',gap:6,flexWrap:'wrap',justifyContent:'center'}}>
+      <div className="game-controls">
         {[['▲','ArrowUp'],['◀','ArrowLeft'],['▼','ArrowDown'],['▶','ArrowRight']].map(([l,k])=>(
-          <button key={k} onMouseDown={()=>{kRef.current[k]=true;setStarted(true);}} onMouseUp={()=>{kRef.current[k]=false;}} style={{padding:'6px 12px',borderRadius:8,border:`1px solid ${color}40`,background:`${color}15`,color,fontSize:13,cursor:'pointer',fontFamily:'inherit',fontWeight:700}}>{l}</button>
+          <button key={k}
+            onMouseDown={()=>{kRef.current[k]=true;setStarted(true);}} onMouseUp={()=>{kRef.current[k]=false;}} onMouseLeave={()=>{kRef.current[k]=false;}}
+            onTouchStart={e=>{e.preventDefault();kRef.current[k]=true;setStarted(true);}} onTouchEnd={e=>{e.preventDefault();kRef.current[k]=false;}}
+            className="game-btn" style={{minWidth:48,minHeight:48,padding:'6px 12px',borderRadius:8,border:`1px solid ${color}40`,background:`${color}15`,color,fontSize:14,cursor:'pointer',fontFamily:'inherit',fontWeight:700,userSelect:'none',touchAction:'manipulation'}}>{l}</button>
         ))}
-        <button onClick={startGame} style={{padding:'6px 14px',borderRadius:8,border:`1px solid ${color}40`,background:`${color}25`,color,fontSize:13,cursor:'pointer',fontFamily:'inherit',fontWeight:700}}>{started?'↺ Reset':'▶ Play'}</button>
+        <button onClick={startGame} onTouchStart={e=>{e.preventDefault();startGame();}} className="game-btn" style={{minWidth:48,minHeight:48,padding:'6px 14px',borderRadius:8,border:`1px solid ${color}40`,background:`${color}25`,color,fontSize:14,cursor:'pointer',fontFamily:'inherit',fontWeight:700,userSelect:'none',touchAction:'manipulation'}}>{started?'↺ Reset':'▶ Play'}</button>
       </div>
       <div style={{color:'rgba(255,255,255,0.4)',fontSize:12}}>Arrow Keys / WASD — move the glowing box!</div>
     </div>
@@ -192,15 +195,18 @@ export function Day8Game({ color }) {
     return()=>{cancelAnimationFrame(rafRef.current);canvas.removeEventListener('keydown',onKey);canvas.removeEventListener('keyup',onKey);};
   },[]);
 
-  const btnStyle=(bg)=>({padding:'8px 14px',borderRadius:8,border:`1px solid ${color}40`,background:bg,color,fontSize:13,cursor:'pointer',fontFamily:'inherit',fontWeight:700,userSelect:'none'});
+  const btnStyle=(bg,extra={})=>({minWidth:48,minHeight:48,padding:'8px 14px',borderRadius:8,border:`1px solid ${color}40`,background:bg,color,fontSize:14,cursor:'pointer',fontFamily:'inherit',fontWeight:700,userSelect:'none',touchAction:'manipulation',WebkitTapHighlightColor:'transparent',...extra});
   return (
     <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:12}}>
-      <canvas ref={cvRef} width={W} height={H} tabIndex={0} onClick={()=>cvRef.current?.focus()} style={{borderRadius:12,border:`2px solid ${color}40`,outline:'none',cursor:'crosshair',display:'block'}}/>
-      <div style={{display:'flex',gap:6,flexWrap:'wrap',justifyContent:'center'}}>
+      <canvas ref={cvRef} width={W} height={H} tabIndex={0} onClick={()=>{start();cvRef.current?.focus();}} style={{borderRadius:12,border:`2px solid ${color}40`,outline:'none',cursor:'crosshair',display:'block'}}/>
+      <div className="game-controls">
         {[['▲','ArrowUp'],['◀','ArrowLeft'],['▼','ArrowDown'],['▶','ArrowRight']].map(([l,k])=>(
-          <button key={k} onMouseDown={()=>{kRef.current[k]=true;}} onMouseUp={()=>{kRef.current[k]=false;}} style={btnStyle(`${color}15`)}>{l}</button>
+          <button key={k}
+            onMouseDown={()=>{kRef.current[k]=true;}} onMouseUp={()=>{kRef.current[k]=false;}} onMouseLeave={()=>{kRef.current[k]=false;}}
+            onTouchStart={e=>{e.preventDefault();kRef.current[k]=true;start();}} onTouchEnd={e=>{e.preventDefault();kRef.current[k]=false;}}
+            className="game-btn" style={btnStyle(`${color}15`)}>{l}</button>
         ))}
-        <button onClick={start} style={btnStyle(`${color}25`)}>{st==='idle'?'▶ Play':'↺ Restart'}</button>
+        <button onClick={start} onTouchStart={e=>{e.preventDefault();start();}} className="game-btn" style={btnStyle(`${color}25`)}>{st==='idle'?'▶ Play':'↺ Restart'}</button>
       </div>
       <div style={{color:'rgba(255,255,255,0.4)',fontSize:12}}>Click canvas · WASD or Arrows to dodge · survive as long as possible!</div>
     </div>
@@ -211,6 +217,9 @@ export function Day8Game({ color }) {
 export function Day10Game({ color }) {
   const canvasRef=useRef(null),stateRef=useRef(null),rafRef=useRef(null);
   const [status,setStatus]=useState('idle');
+  // statusRef keeps the closure in useEffect always up-to-date (avoids stale-closure restart bug)
+  const statusRef=useRef('idle');
+  const updateStatus=(s)=>{statusRef.current=s;setStatus(s);};
   const W=380,H=420,GAP=130,PIPE_W=52,SPEED=2.8,GRAVITY=0.38,JUMP=-7.5;
 
   const initState=()=>({by:H/2,bv:0,pipes:[{x:W+80,gy:rnd(120,H-150)}],score:0,hs:stateRef.current?.hs||0,frame:0});
@@ -246,7 +255,7 @@ export function Day10Game({ color }) {
   const startGame=()=>{
     const canvas=canvasRef.current;if(!canvas)return;
     const ctx=canvas.getContext('2d');
-    stateRef.current={...initState()};setStatus('playing');cancelAnimationFrame(rafRef.current);
+    stateRef.current={...initState()};updateStatus('playing');cancelAnimationFrame(rafRef.current);
     const loop=()=>{
       const s=stateRef.current;s.bv+=GRAVITY;s.by+=s.bv;s.frame++;
       s.pipes.forEach(p=>{p.x-=SPEED;});
@@ -255,7 +264,7 @@ export function Day10Game({ color }) {
       s.pipes.forEach(p=>{if(!p.passed&&p.x+PIPE_W<80){p.passed=true;s.score++;if(s.score>s.hs)s.hs=s.score;}});
       const dead=s.by>H-15||s.by<0||s.pipes.some(p=>80+16>p.x&&80-16<p.x+PIPE_W&&(s.by-11<p.gy-GAP/2||s.by+11>p.gy+GAP/2));
       draw(ctx,s,dead?'dead':'playing');
-      if(dead){setStatus('dead');return;}
+      if(dead){updateStatus('dead');return;}
       rafRef.current=requestAnimationFrame(loop);
     };
     rafRef.current=requestAnimationFrame(loop);
@@ -263,23 +272,36 @@ export function Day10Game({ color }) {
 
   const handleInput=(e)=>{
     if(e.type==='keydown'&&e.code!=='Space')return;e.preventDefault();
-    if(status==='idle'||status==='dead'){startGame();return;}
+    if(statusRef.current==='idle'||statusRef.current==='dead'){startGame();return;}
     if(stateRef.current)stateRef.current.bv=JUMP;
   };
 
   useEffect(()=>{
     const canvas=canvasRef.current;if(!canvas)return;
     stateRef.current=initState();draw(canvas.getContext('2d'),stateRef.current,'idle');
-    const ok=e=>{if(e.type==='keydown'&&e.code!=='Space')return;e.preventDefault();if(status==='idle'||status==='dead')startGame();else if(stateRef.current)stateRef.current.bv=JUMP;};
-    canvas.addEventListener('keydown',ok);return()=>{cancelAnimationFrame(rafRef.current);canvas.removeEventListener('keydown',ok);};
+    // Use statusRef (not status) — avoids stale closure: status would always be 'idle' here
+    const ok=e=>{
+      if(e.type==='keydown'&&e.code!=='Space')return;
+      e.preventDefault();
+      if(statusRef.current==='idle'||statusRef.current==='dead')startGame();
+      else if(stateRef.current)stateRef.current.bv=JUMP;
+    };
+    canvas.addEventListener('keydown',ok);
+    return()=>{cancelAnimationFrame(rafRef.current);canvas.removeEventListener('keydown',ok);};
   },[]);
 
   return (
     <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:12}}>
       <canvas ref={canvasRef} width={W} height={H} tabIndex={0} onClick={handleInput} onKeyDown={handleInput} style={{borderRadius:12,border:`2px solid ${color}40`,outline:'none',cursor:'pointer',display:'block'}}/>
       <div style={{display:'flex',gap:8}}>
-        <button onMouseDown={e=>{e.preventDefault();if(stateRef.current)stateRef.current.bv=JUMP;}} style={{padding:'8px 20px',borderRadius:8,border:`1px solid ${color}50`,background:`${color}15`,color,fontSize:14,cursor:'pointer',fontFamily:'inherit',fontWeight:700}}>🐦 FLAP</button>
-        <button onMouseDown={()=>{cancelAnimationFrame(rafRef.current);const cv=canvasRef.current;const ctx=cv?.getContext('2d');stateRef.current={...initState(),hs:stateRef.current?.hs||0};if(ctx)draw(ctx,stateRef.current,'idle');setStatus('idle');}} style={{padding:'8px 16px',borderRadius:8,border:'1px solid rgba(255,255,255,0.15)',background:'rgba(255,255,255,0.04)',color:'rgba(255,255,255,0.5)',fontSize:14,cursor:'pointer',fontFamily:'inherit'}}>↺ Reset</button>
+        <button
+          onMouseDown={e=>{e.preventDefault();if(status==='idle'||status==='dead'){startGame();return;}if(stateRef.current)stateRef.current.bv=JUMP;}}
+          onTouchStart={e=>{e.preventDefault();if(status==='idle'||status==='dead'){startGame();return;}if(stateRef.current)stateRef.current.bv=JUMP;}}
+          className="game-btn" style={{minWidth:90,padding:'12px 28px',borderRadius:10,border:`2px solid ${color}70`,background:`${color}25`,color,fontSize:17,cursor:'pointer',fontFamily:'inherit',fontWeight:900,userSelect:'none',touchAction:'manipulation',WebkitTapHighlightColor:'transparent',boxShadow:`0 0 18px ${color}35`}}>🐦 FLAP</button>
+        <button
+          onMouseDown={()=>{cancelAnimationFrame(rafRef.current);const cv=canvasRef.current;const ctx=cv?.getContext('2d');stateRef.current={...initState(),hs:stateRef.current?.hs||0};if(ctx)draw(ctx,stateRef.current,'idle');updateStatus('idle');}}
+          onTouchStart={e=>{e.preventDefault();cancelAnimationFrame(rafRef.current);const cv=canvasRef.current;const ctx=cv?.getContext('2d');stateRef.current={...initState(),hs:stateRef.current?.hs||0};if(ctx)draw(ctx,stateRef.current,'idle');updateStatus('idle');}}
+          className="game-btn" style={{minWidth:56,padding:'12px 16px',borderRadius:10,border:'1px solid rgba(255,255,255,0.15)',background:'rgba(255,255,255,0.04)',color:'rgba(255,255,255,0.5)',fontSize:14,cursor:'pointer',fontFamily:'inherit',userSelect:'none',touchAction:'manipulation'}}>↺ Reset</button>
       </div>
       <div style={{color:'rgba(255,255,255,0.4)',fontSize:12}}>SPACE / Click / Tap to flap</div>
     </div>
@@ -373,16 +395,22 @@ function SpaceShooterGame({ color }) {
     return()=>{cancelAnimationFrame(rafRef.current);canvas.removeEventListener('keydown',onKey);canvas.removeEventListener('keyup',onKey);};
   },[]);
 
-  const bs=(extra={})=>({padding:'6px 12px',borderRadius:8,border:`1px solid ${color}40`,background:`${color}15`,color,fontSize:13,cursor:'pointer',fontFamily:'inherit',fontWeight:700,userSelect:'none',...extra});
+  const bs=(extra={})=>({minWidth:48,minHeight:48,padding:'8px 12px',borderRadius:8,border:`1px solid ${color}40`,background:`${color}15`,color,fontSize:14,cursor:'pointer',fontFamily:'inherit',fontWeight:700,userSelect:'none',touchAction:'manipulation',WebkitTapHighlightColor:'transparent',...extra});
   return (
     <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:12}}>
-      <canvas ref={canvasRef} width={W} height={H} tabIndex={0} onClick={()=>canvasRef.current?.focus()} style={{borderRadius:12,border:`2px solid ${color}40`,outline:'none',cursor:'crosshair',display:'block'}}/>
-      <div style={{display:'flex',gap:6,flexWrap:'wrap',justifyContent:'center'}}>
+      <canvas ref={canvasRef} width={W} height={H} tabIndex={0} onClick={()=>{startGame();canvasRef.current?.focus();}} style={{borderRadius:12,border:`2px solid ${color}40`,outline:'none',cursor:'crosshair',display:'block'}}/>
+      <div className="game-controls">
         {[['◀ A','a'],['▲ W','w'],['▼ S','s'],['D ▶','d']].map(([l,k])=>(
-          <button key={k} onMouseDown={()=>{keysRef.current[k]=true;}} onMouseUp={()=>{keysRef.current[k]=false;}} style={bs()}>{l}</button>
+          <button key={k}
+            onMouseDown={()=>{keysRef.current[k]=true;}} onMouseUp={()=>{keysRef.current[k]=false;}} onMouseLeave={()=>{keysRef.current[k]=false;}}
+            onTouchStart={e=>{e.preventDefault();keysRef.current[k]=true;}} onTouchEnd={e=>{e.preventDefault();keysRef.current[k]=false;}}
+            className="game-btn" style={bs()}>{l}</button>
         ))}
-        <button onMouseDown={()=>{keysRef.current[' ']=true;}} onMouseUp={()=>{keysRef.current[' ']=false;}} style={bs({background:`${color}25`,border:`1px solid ${color}60`})}>🔫 SHOOT</button>
-        <button onClick={startGame} style={bs({background:`${color}20`})}>{status==='idle'?'▶ Launch':'↺ Restart'}</button>
+        <button
+          onMouseDown={()=>{keysRef.current[' ']=true;}} onMouseUp={()=>{keysRef.current[' ']=false;}} onMouseLeave={()=>{keysRef.current[' ']=false;}}
+          onTouchStart={e=>{e.preventDefault();keysRef.current[' ']=true;}} onTouchEnd={e=>{e.preventDefault();keysRef.current[' ']=false;}}
+          className="game-btn" style={bs({background:`${color}25`,border:`1px solid ${color}60`,minWidth:76,fontSize:15})}>🔫 SHOOT</button>
+        <button onClick={startGame} onTouchStart={e=>{e.preventDefault();startGame();}} className="game-btn" style={bs({background:`${color}20`})}>{status==='idle'?'▶ Launch':'↺ Restart'}</button>
       </div>
       <div style={{color:'rgba(255,255,255,0.4)',fontSize:12}}>Click canvas · WASD to move · SPACE to shoot</div>
     </div>

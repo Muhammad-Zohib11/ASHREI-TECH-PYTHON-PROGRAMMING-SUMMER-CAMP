@@ -40,7 +40,7 @@ export function TerminalShell({ color, title, lines, input, onInput, onSubmit, p
           onKeyDown={e=>{ if(e.key==='Enter') onSubmit(); }}
           placeholder={disabled ? '— game over —' : placeholder}
           disabled={disabled}
-          style={{ flex:1, background:'transparent', border:'none', outline:'none', color:'#e2e8f0', fontFamily:'var(--font-code)', fontSize:13, caretColor:color, opacity:disabled?0.3:1 }}
+          style={{ flex:1, background:'transparent', border:'none', outline:'none', color:'#e2e8f0', fontFamily:'var(--font-code)', fontSize:16, caretColor:color, opacity:disabled?0.3:1 }}
           autoComplete="off" spellCheck={false}
         />
         <button onClick={onSubmit} disabled={disabled} style={{ background:`${color}20`, border:`1px solid ${color}40`, borderRadius:6, color, fontSize:12, padding:'4px 12px', cursor:'pointer', fontFamily:'inherit', fontWeight:700, opacity:disabled?0.3:1 }}>Enter ↵</button>

@@ -110,7 +110,7 @@ function progressReducer(state, action) {
         gamerTag:        'admin123',
         xp:              9999,
         unlockedDays:    [1,2,3,4,5,6,7,8,9,10,11,12],
-        completedDays:   [1,2,3,4,5,6,7,8,9,10,11],  // all unlocked, last one pending showcase
+        completedDays:   [],  // days not pre-completed — admin uses skip buttons
         earnedBadges:    [],
         completedChallenges: [],
       };

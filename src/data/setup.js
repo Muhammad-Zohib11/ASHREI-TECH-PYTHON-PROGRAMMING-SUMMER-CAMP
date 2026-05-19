@@ -135,35 +135,70 @@ export const SETUP_DATA = {
   9: {
     pythonVersion: '3.9+',
     commands: [
-      { cmd: 'pip install pygame',         comment: 'install the Pygame library' },
-      { cmd: 'python -c "import pygame; print(pygame.ver)"', comment: 'verify Pygame installed correctly' },
-      { cmd: 'python day9.py',             comment: 'run your Flappy Bird script' },
+      { cmd: 'pip install pygame',         comment: 'install Pygame — required for Days 9–12!' },
+      { cmd: 'python -c "import pygame; print(\'Pygame\', pygame.version.ver, \'- OK!\')"', comment: 'verify Pygame installed correctly' },
+      { cmd: 'python day9.py',             comment: 'run your Window Builder script' },
     ],
     packages: ['pygame'],
-    extensions: ['Python (Microsoft)', 'Pylance', 'Pygame Snippets'],
-    note: 'Pygame opens a SEPARATE WINDOW — not output in VS Code terminal. If nothing appears, check your taskbar!',
+    extensions: ['Python (Microsoft)', 'Pylance'],
+    note: 'Pygame opens a SEPARATE WINDOW — not output in the VS Code terminal. If nothing appears, check your taskbar! Run the verify command above first to confirm the install.',
     troubleshooting: [
-      { issue: 'ModuleNotFoundError: No module named "pygame"', fix: 'Run: pip install pygame in the TERMINAL (not Python shell). Make sure you are using the right Python environment.' },
-      { issue: 'pip is not recognized', fix: 'Try: python -m pip install pygame or py -m pip install pygame on Windows.' },
-      { issue: 'Pygame window opens but immediately closes', fix: 'You are missing the game loop: while running: followed by pygame.event.get(). Add it to keep the window open.' },
-      { issue: 'Black screen / nothing renders', fix: 'Call pygame.display.flip() or pygame.display.update() at the end of your game loop.' },
+      { issue: 'ModuleNotFoundError: No module named "pygame"', fix: 'Run: pip install pygame in the TERMINAL (not the Python shell). If pip is not found, try: python -m pip install pygame' },
+      { issue: 'pip is not recognized as a command', fix: 'Use: python -m pip install pygame  instead of just pip.' },
+      { issue: 'Pygame window opens but immediately closes', fix: 'You are missing the game loop. Add: while running:  with pygame.event.get() inside to keep the window alive.' },
+      { issue: 'Black screen / shapes not visible', fix: 'Call pygame.display.flip() at the END of your game loop — without it nothing is shown on screen.' },
     ],
   },
 
   10: {
     pythonVersion: '3.9+',
     commands: [
-      { cmd: 'pip show pygame',             comment: 'confirm pygame version' },
-      { cmd: 'python space_shooter.py',     comment: 'run your final Space Shooter!' },
-      { cmd: 'pip freeze > requirements.txt', comment: 'export your dependencies for sharing' },
+      { cmd: 'python -c "import pygame; print(pygame.version.ver)"', comment: 'confirm Pygame is still installed from Day 9' },
+      { cmd: 'python day10_flappy.py',      comment: 'run your Flappy Bird game' },
+    ],
+    packages: ['pygame'],
+    extensions: ['Python (Microsoft)', 'Pylance'],
+    note: 'Pygame was installed on Day 9. If you get ModuleNotFoundError, run: pip install pygame',
+    troubleshooting: [
+      { issue: 'Bird falls through the floor instantly', fix: 'Check GRAVITY = 0.5 is not too high. Also verify the floor check: if bird_y > HEIGHT: running = False is inside the game loop.' },
+      { issue: 'SPACE key does not make the bird jump', fix: 'Check for event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE inside the for event in pygame.event.get() loop.' },
+      { issue: 'Pipes never appear or scroll off instantly', fix: 'pipe_x must start at WIDTH (right edge of screen). Decrease it by 4 each frame INSIDE the game loop.' },
+      { issue: 'colliderect() never fires / collision not working', fix: 'Both objects must be pygame.Rect — not plain tuples. Wrap coordinates: pygame.Rect(x, y, width, height).' },
+    ],
+  },
+
+  11: {
+    pythonVersion: '3.9+',
+    commands: [
+      { cmd: 'python -c "import pygame; print(pygame.version.ver)"', comment: 'verify Pygame is ready' },
+      { cmd: 'python day11_shooter.py',     comment: 'run your Space Shooter Part 1' },
+    ],
+    packages: ['pygame'],
+    extensions: ['Python (Microsoft)', 'Pylance'],
+    note: 'Start from your Day 9 game loop skeleton — copy it as day11_shooter.py to save setup time.',
+    troubleshooting: [
+      { issue: 'ValueError: list.remove(x): x not in list', fix: 'Loop over a COPY of the list using [:]: for b in bullets[:] — this lets you safely remove items during the loop.' },
+      { issue: 'Bullets not visible on screen', fix: 'Draw bullets INSIDE the game loop, AFTER screen.fill() and BEFORE pygame.display.flip(). Check drawing order.' },
+      { issue: 'Enemies disappear immediately after spawning', fix: 'Check your cleanup condition: enemies = [e for e in enemies if e.top < H]. You may have it reversed (< vs >).' },
+      { issue: 'Player ship moves off-screen', fix: 'Add boundary checks: if keys[K_a] and player.left > 0: player.x -= SPEED' },
+    ],
+  },
+
+  12: {
+    pythonVersion: '3.9+',
+    commands: [
+      { cmd: 'copy day11_shooter.py day12_shooter_final.py', comment: 'copy Day 11 file to protect your work (Windows)' },
+      { cmd: 'python day12_shooter_final.py', comment: 'run your completed Space Shooter!' },
+      { cmd: 'pip freeze > requirements.txt', comment: 'export project dependencies for sharing' },
     ],
     packages: ['pygame'],
     extensions: ['Python (Microsoft)', 'Pylance', 'GitLens'],
-    note: 'Today is showcase day! Make sure your game runs from a FRESH terminal before presenting.',
+    note: 'Showcase day! Make sure your game runs from a FRESH terminal before presenting to the class.',
     troubleshooting: [
-      { issue: 'Game runs slow / low FPS', fix: 'Add pygame.time.Clock() and call clock.tick(60) in your game loop to cap at 60 FPS.' },
-      { issue: 'Images/sounds not loading', fix: 'Check that asset file paths are relative to where you run the script. Use os.path.join() for cross-platform paths.' },
-      { issue: 'Sharing the game — friend cannot run it', fix: 'They need Python + pygame installed. Share requirements.txt and tell them to run: pip install -r requirements.txt' },
+      { issue: 'Game crashes with ValueError on bullet-enemy collision', fix: 'Add break after bullets.remove(b). Without break, Python tries to check a bullet that no longer exists in the list.' },
+      { issue: 'Restart button (R) does not fully reset', fix: 'ALL variables (bullets, enemies, score, health, player position) must be reset at the top of the outer while True: restart loop.' },
+      { issue: 'HUD text appears behind game objects', fix: 'Draw the HUD LAST in the draw section — drawing order determines what appears on top.' },
+      { issue: 'Sharing the game with friends', fix: 'They need Python + Pygame. Share your .py file + requirements.txt. They run: pip install -r requirements.txt' },
     ],
   },
 

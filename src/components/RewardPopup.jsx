@@ -1,4 +1,4 @@
-// Lightweight pure-CSS confetti (no libraries)
+import { useEffect } from 'react';
 const CONFETTI_COLORS = ['#00f5ff','#f59e0b','#10b981','#8b5cf6','#ff6b35','#ec4899','#fff'];
 
 function Confetti() {
@@ -19,8 +19,7 @@ function Confetti() {
           position:'absolute', top: 0, left: p.left,
           width: p.size, height: p.size,
           background: p.color, borderRadius: p.shape,
-          animation: `confettiFall ${p.dur} ${p.delay} ease-in forwards,
-                      confettiSway ${p.dur} ${p.delay} ease-in-out forwards`,
+          animation: `confettiFall ${p.dur} ${p.delay} ease-in forwards`,
           opacity: 0,
         }} />
       ))}
@@ -28,28 +27,44 @@ function Confetti() {
   );
 }
 
-export default function RewardPopup({ type, day, onClose }) {
+export default function RewardPopup({ type, day, nextDay, onClose }) {
+  // Keyboard dismiss — Enter or Space or Escape
+  useEffect(() => {
+    const handle = (e) => {
+      if (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handle);
+    return () => window.removeEventListener('keydown', handle);
+  }, [onClose]);
+
+  const overlayStyle = {
+    position:'fixed', inset:0, zIndex:1000,
+    background:'rgba(0,0,0,0.82)', backdropFilter:'blur(12px)',
+    display:'flex', alignItems:'flex-start', justifyContent:'center',
+    paddingTop:'5vh', paddingLeft:16, paddingRight:16,
+    overflowY:'auto',
+  };
+
   if (type === 'xp') {
     return (
       <>
         <Confetti />
-        <div
-          onClick={onClose}
-          style={{ position:'fixed', inset:0, display:'flex', alignItems:'center', justifyContent:'center', zIndex:1000, background:'rgba(0,0,0,0.82)', backdropFilter:'blur(12px)' }}
-        >
+        <div onClick={onClose} style={overlayStyle}>
           <div style={{
             background:'linear-gradient(135deg, rgba(0,245,255,0.16), rgba(245,158,11,0.16))',
-            border:'1px solid rgba(0,245,255,0.5)', borderRadius:28, padding:'52px 72px',
+            border:'1px solid rgba(0,245,255,0.5)', borderRadius:24, padding:'36px 48px',
             textAlign:'center', animation:'popupIn 0.4s cubic-bezier(0.34,1.56,0.64,1)',
-            position:'relative',
+            width:'100%', maxWidth:420,
           }}>
-            <div style={{ fontSize:80, marginBottom:12, animation:'float 2s ease-in-out infinite' }}>⚡</div>
-            <div style={{ fontFamily:'var(--font-head)', fontSize:56, color:'#f59e0b', fontWeight:900, textShadow:'0 0 30px rgba(245,158,11,0.6)' }}>
-              +{day.xp}
+            <div style={{ fontSize:60, marginBottom:8, animation:'float 2s ease-in-out infinite' }}>⚡</div>
+            <div style={{ fontFamily:'var(--font-head)', fontSize:46, color:'#f59e0b', fontWeight:900, textShadow:'0 0 30px rgba(245,158,11,0.6)', lineHeight:1 }}>
+              +{day.xp} XP
             </div>
-            <div style={{ color:'#f59e0b', fontWeight:800, fontSize:22, marginBottom:8 }}>XP EARNED!</div>
-            <div style={{ color:'rgba(255,255,255,0.55)', fontSize:15, marginBottom:8 }}>Challenge Complete — Incredible Work!</div>
-            <div style={{ color:'rgba(255,255,255,0.25)', fontSize:12 }}>Click anywhere to continue</div>
+            <div style={{ color:'#f59e0b', fontWeight:800, fontSize:18, marginTop:6, marginBottom:6 }}>CHALLENGE COMPLETE!</div>
+            <div style={{ color:'rgba(255,255,255,0.5)', fontSize:14, marginBottom:20 }}>Incredible work — badge incoming!</div>
+            <div style={{ background:'rgba(0,245,255,0.08)', border:'1px solid rgba(0,245,255,0.25)', borderRadius:10, padding:'10px 20px', color:'rgba(255,255,255,0.4)', fontSize:12 }}>
+              Tap anywhere to continue
+            </div>
           </div>
         </div>
       </>
@@ -58,26 +73,32 @@ export default function RewardPopup({ type, day, onClose }) {
 
   if (type === 'badge') {
     return (
-      <div
-        onClick={onClose}
-        style={{ position:'fixed', inset:0, display:'flex', alignItems:'center', justifyContent:'center', zIndex:1000, background:'rgba(0,0,0,0.82)', backdropFilter:'blur(12px)' }}
-      >
+      <div onClick={onClose} style={overlayStyle}>
         <div style={{
-          background:`linear-gradient(135deg, ${day.color}28, rgba(255,255,255,0.04))`,
-          border:`2px solid ${day.color}80`, borderRadius:28, padding:'52px 72px',
+          background:`linear-gradient(135deg, ${day.color}22, rgba(255,255,255,0.04))`,
+          border:`2px solid ${day.color}70`, borderRadius:24, padding:'36px 48px',
           textAlign:'center', animation:'popupIn 0.4s cubic-bezier(0.34,1.56,0.64,1)',
-          boxShadow:`0 0 80px ${day.color}40`,
+          boxShadow:`0 0 60px ${day.color}35`,
+          width:'100%', maxWidth:420,
         }}>
-          <div style={{ position:'relative', display:'inline-block', marginBottom:14 }}>
-            <div style={{ position:'absolute', inset:-20, borderRadius:'50%', border:`2px solid ${day.color}60`, animation:'pulseRing 1.5s ease-out infinite' }} />
-            <div style={{ fontSize:90, animation:'float 2s ease-in-out infinite' }}>{day.badgeIcon}</div>
+          <div style={{ color:'rgba(255,255,255,0.4)', fontSize:11, fontWeight:800, letterSpacing:3, marginBottom:10 }}>🏅 BADGE UNLOCKED</div>
+          <div style={{ position:'relative', display:'inline-block', marginBottom:10 }}>
+            <div style={{ position:'absolute', inset:-16, borderRadius:'50%', border:`2px solid ${day.color}50`, animation:'pulseRing 1.5s ease-out infinite' }} />
+            <div style={{ fontSize:70, animation:'float 2s ease-in-out infinite' }}>{day.badgeIcon}</div>
           </div>
-          <div style={{ color:'rgba(255,255,255,0.4)', fontSize:12, fontWeight:800, letterSpacing:3, marginBottom:12 }}>🏅 BADGE UNLOCKED!</div>
-          <div style={{ fontFamily:'var(--font-head)', fontSize:26, color:day.color, fontWeight:900, marginBottom:8, textShadow:`0 0 20px ${day.color}` }}>
+          <div style={{ fontFamily:'var(--font-head)', fontSize:24, color:day.color, fontWeight:900, marginBottom:6, textShadow:`0 0 18px ${day.color}` }}>
             {day.badge}
           </div>
-          <div style={{ color:'rgba(255,255,255,0.5)', fontSize:14, marginBottom:20 }}>Added to your collection</div>
-          <div style={{ color:'rgba(255,255,255,0.25)', fontSize:12 }}>Click anywhere to continue</div>
+          <div style={{ color:'rgba(255,255,255,0.4)', fontSize:13, marginBottom:20 }}>Added to your collection</div>
+          <div style={{
+            background: nextDay ? `linear-gradient(135deg, ${day.color}, ${nextDay.color || day.color})` : 'rgba(255,255,255,0.08)',
+            border: nextDay ? 'none' : '1px solid rgba(255,255,255,0.12)',
+            borderRadius:12, padding:'13px 24px',
+            color: nextDay ? '#000' : 'rgba(255,255,255,0.4)',
+            fontSize:14, fontWeight:800,
+          }}>
+            {nextDay ? `🚀 Tap to start Day ${nextDay.id}: ${nextDay.subtitle}` : '🏁 You completed all days!'}
+          </div>
         </div>
       </div>
     );

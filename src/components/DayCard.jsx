@@ -11,9 +11,14 @@ export default function DayCard({ day, onClick }) {
 
   return (
     <div
+      role={locked ? undefined : 'button'}
+      tabIndex={locked ? undefined : 0}
       onClick={() => !locked && onClick(day)}
+      onKeyDown={e => !locked && (e.key === 'Enter' || e.key === ' ') && onClick(day)}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      aria-label={locked ? `Day ${day.id}: ${day.title} — locked` : `Day ${day.id}: ${day.title}`}
+      aria-disabled={locked}
       style={{
         borderRadius:18, padding:22, position:'relative', overflow:'hidden',
         background: locked
